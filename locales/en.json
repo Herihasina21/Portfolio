@@ -1,0 +1,44 @@
+{
+  "nav.home": "Home",
+  "nav.about": "About",
+  "nav.skills": "Skills",
+  "nav.projects": "Projects",
+  "nav.contact": "Contact",
+  "nav.name": "Michael",
+
+  "hero.greeting": "Hello, I'm a Web Developer",
+  "hero.description": "Passionate developer focused on building modern web and mobile applications. I transform ideas into performant, elegant digital solutions centered on user experience.",
+  "hero.cta_primary": "View My Work",
+  "hero.cta_secondary": "Get In Touch",
+  "hero.badge": "Fullstack Developer",
+
+  "about.title": "About",
+  "about.subtitle1": "My name is <strong>Herihasina Michael RAKOTOARIVONY</strong>, a passionate <strong>Fullstack Developer</strong> with more than <strong>3 years of experience</strong> in designing and developing <strong>modern web and mobile applications</strong>. I hold a <strong>Bachelor’s degree in Computer Science</strong> and I am currently pursuing a <strong>Master’s degree at the National School of Computer Science (E.N.I) Madagascar</strong>.",
+  "about.subtitle2": "I design and build <strong>scalable and high-performance applications</strong>, with a strong focus on <strong>code quality</strong>, <strong>maintainability</strong>, and <strong>user experience</strong>. My goal is to transform <strong>ideas</strong> into <strong>reliable, efficient, and well-structured digital solutions</strong>.",
+  "about.subtitle3": "<strong>Curious</strong>, <strong>detail-oriented</strong>, and <strong>solution-driven</strong>, I enjoy taking on new <strong>technical challenges</strong> and contributing to the creation of <strong>innovative products</strong>. I am currently <strong>open to professional opportunities</strong>, <strong>collaborations</strong>, and <strong>freelance projects</strong>.",
+
+  "skills.title": "Skills",
+  "skills.languages": "Languages",
+  "skills.frameworks": "Frameworks",
+  "skills.databases": "Databases",
+  "skills.tools": "Tools",
+
+  "projects.title": "Featured Projects",
+  "projects.filter_all": "All",
+  "projects.filter_web": "Web",
+  "projects.filter_app": "App",
+  "projects.view": "View Project",
+
+  "contact.title": "Get In Touch",
+  "contact.description": "Have a project in mind? Let's work together!",
+  "contact.name": "Your Name",
+  "contact.email": "Your Email",
+  "contact.message": "Your Message",
+  "contact.send": "Send Message",
+  "contact.sending": "Sending...",
+  "contact.success": "Message sent successfully!",
+  "contact.error": "Error sending message. Please try again.",
+
+  "footer.rights": "All rights reserved.",
+  "footer.built": "Built with Next.js & Tailwind CSS"
+} 

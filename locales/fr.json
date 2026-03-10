@@ -1,0 +1,44 @@
+{
+  "nav.home": "Accueil",
+  "nav.about": "À Propos",
+  "nav.skills": "Compétences",
+  "nav.projects": "Projets",
+  "nav.contact": "Contact",
+  "nav.name": "Michael",
+
+  "hero.greeting": "Bonjour, je suis Développeur Web",
+  "hero.description": "Développeur passionné par la conception d’applications web et mobiles modernes. Je transforme des idées en solutions digitales performantes, élégantes et centrées sur l’expérience utilisateur.",
+  "hero.cta_primary": "Voir Mon Travail",
+  "hero.cta_secondary": "Me Contacter",
+  "hero.badge": "Développeur Fullstack",
+
+  "about.title": "À Propos",
+  "about.subtitle1": "Je m'appelle <strong>Herihasina Michael RAKOTOARIVONY</strong>, <strong>développeur Fullstack</strong> passionné avec plus de <strong>3 ans d’expérience</strong> dans la conception et le développement d’applications <strong>web et mobiles modernes</strong>. Titulaire d’une <strong>Licence en Informatique</strong>, je poursuis actuellement un <strong>Master à l’École Nationale de l’Informatique (E.N.I) Madagascar</strong>.",
+  "about.subtitle2": "Je conçois et développe des <strong>applications performantes et évolutives</strong> en accordant une attention particulière à la <strong>qualité du code</strong>, à la <strong>maintenabilité</strong> et à l’<strong>expérience utilisateur</strong>. Mon objectif est de transformer des <strong>idées</strong> en <strong>solutions digitales fiables, efficaces et bien structurées</strong>.",
+  "about.subtitle3": "<strong>Curieux</strong>, <strong>rigoureux</strong> et <strong>orienté solution</strong>, j’aime relever de nouveaux <strong>défis techniques</strong> et contribuer à la création de <strong>produits innovants</strong>. Je suis actuellement <strong>ouvert à des opportunités professionnelles</strong>, <strong>collaborations</strong> ou <strong>projets freelance</strong>.",
+
+  "skills.title": "Compétences",
+  "skills.languages": "Langages",
+  "skills.frameworks": "Frameworks",
+  "skills.databases": "Bases de Données",
+  "skills.tools": "Outils",
+
+  "projects.title": "Projets en Vedette",
+  "projects.filter_all": "Tous",
+  "projects.filter_web": "Web",
+  "projects.filter_app": "App",
+  "projects.view": "Voir le Projet",
+
+  "contact.title": "Me Contacter",
+  "contact.description": "Vous avez un projet en tête? Travaillons ensemble!",
+  "contact.name": "Votre Nom",
+  "contact.email": "Votre Email",
+  "contact.message": "Votre Message",
+  "contact.send": "Envoyer le Message",
+  "contact.sending": "Envoi...",
+  "contact.success": "Message envoyé avec succès!",
+  "contact.error": "Erreur lors de l'envoi. Veuillez réessayer.",
+
+  "footer.rights": "Tous droits réservés.",
+  "footer.built": "Construit avec Next.js & Tailwind CSS"
+}
