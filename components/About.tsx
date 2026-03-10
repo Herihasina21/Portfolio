@@ -51,6 +51,10 @@ export default function About() {
     t('about.highlight.6'),
   ]
 
+  const titleWords = t("about.title").split(" ");
+  const firstWords = titleWords.slice(0, -1).join(" ");
+  const lastWord = titleWords[titleWords.length - 1];
+
   return (
     <section
       id="about"
@@ -60,7 +64,7 @@ export default function About() {
       <div className="max-w-6xl mx-auto">
         <div className="mb-12 text-center">
           <h2 className="text-4xl sm:text-5xl font-bold text-foreground mb-4 text-balance">
-            {t("about.title")}
+            {firstWords} <span className="text-accent">{lastWord}</span>
           </h2>
           <div className="w-16 h-1 bg-accent rounded-full mx-auto" />
         </div>

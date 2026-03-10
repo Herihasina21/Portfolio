@@ -10,7 +10,11 @@ interface SkillCardProps {
 
 export default function SkillCard({ title, items }: SkillCardProps) {
   return (
-    <div className="p-8 rounded-2xl border border-border/50 bg-card/20 backdrop-blur-lg hover:border-accent/50 hover:bg-card/40 transition-all duration-500 group relative overflow-hidden">
+    <div
+      className="p-8 rounded-2xl border border-border/50 bg-card/20 backdrop-blur-lg 
+                 hover:border-accent/50 hover:bg-card/40 transition-all duration-500 group relative overflow-hidden
+                 h-full flex flex-col"
+    >
       {/* Title */}
       <h3 className="text-lg font-semibold text-center mb-8 group-hover:text-accent transition-colors">
         {title}

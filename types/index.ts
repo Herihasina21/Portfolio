@@ -1,23 +1,30 @@
+export type LanguageText = {
+  en: string;
+  fr: string;
+};
+
 export interface Project {
-  id: string
-  title: string
-  description: string
-  image: string
-  category: string
-  technologies: string[]
-  link: string
-  github?: string
+  id: string;
+  title: LanguageText;
+  description: LanguageText;
+  image: string;
+  category: string;
+  technologies: string[];
+  link: string;
+  github?: string;
 }
 
 export interface Service {
-  id: string
-  title: string
-  description: string
-  icon: string
+  id: string;
+  title: LanguageText;
+  description: LanguageText;
+  icon: string;
 }
 
 export interface ContactFormData {
-  name: string
-  email: string
-  message: string
+  name: string;
+  email: string;
+  message: string;
 }
+
+export type Language = "en" | "fr";

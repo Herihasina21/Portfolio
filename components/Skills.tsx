@@ -1,4 +1,4 @@
-"use client";
+'use client'
 
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
@@ -50,6 +50,11 @@ export default function Skills() {
     );
   }, []);
 
+  // Split the title to accentuate the last word
+  const skillTitleWords = t("skills.title").split(" ");
+  const firstWords = skillTitleWords.slice(0, -1).join(" ");
+  const lastWord = skillTitleWords[skillTitleWords.length - 1];
+
   return (
     <section
       id="skills"
@@ -59,8 +64,11 @@ export default function Skills() {
       <div className="max-w-6xl mx-auto">
         {/* title */}
         <div className="text-center mb-12">
-          <h2 ref={titleRef} className="text-4xl md:text-5xl font-bold mb-4">
-            {t("skills.title")}
+          <h2
+            ref={titleRef}
+            className="text-4xl md:text-5xl font-bold mb-4 text-balance"
+          >
+            {firstWords} <span className="text-accent">{lastWord}</span>
           </h2>
 
           <div className="w-16 h-1 bg-accent rounded-full mx-auto" />
@@ -69,7 +77,7 @@ export default function Skills() {
         {/* cards */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
           {skillsData.map((category) => (
-            <div key={category.title} className="skill-card">
+            <div key={category.title} className="skill-card h-full">
               <SkillCard title={t(category.title)} items={category.items} />
             </div>
           ))}
