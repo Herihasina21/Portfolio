@@ -165,7 +165,7 @@ export default function Hero() {
             {/* Image container */}
             <div className="relative bg-card/50 rounded-2xl overflow-hidden border border-border/50 h-full flex items-center justify-center">
               <Image
-                src="/herihasina.png"
+                src="assets/herihasina.png"
                 alt="Herihasina"
                 width={400}
                 height={400}

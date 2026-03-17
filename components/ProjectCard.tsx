@@ -16,13 +16,25 @@ export default function ProjectCard({ project, language }: ProjectCardProps) {
   return (
     <div className="project-card group rounded-xl overflow-hidden border border-border hover:border-accent/50 bg-background transition-all duration-300">
       {/* Image */}
-      <div className="relative h-48 bg-gradient-to-br from-accent/20 to-accent/5 overflow-hidden flex items-center justify-center">
+      <div className="relative h-48 overflow-hidden flex items-center justify-center">
+        {/* project picture if available */}
+        {project.image && (
+          <img
+            src={project.image}
+            alt={project.title[language]}
+            className="absolute inset-0 w-full h-full object-cover opacity-70 group-hover:opacity-100 transition-opacity duration-300"
+          />
+        )}
+        {/* overlay to ensure text is visible */}
         <div className="absolute inset-0 bg-accent/10 group-hover:bg-accent/20 transition-colors duration-300" />
-        <div className="text-center relative z-10">
-          <div className="text-4xl font-bold text-accent/30 group-hover:text-accent/50 transition-colors">
-            {project.title[language][0]}
+        {/* fallback title initial when image not available */}
+        {!project.image && (
+          <div className="text-center relative z-10">
+            <div className="text-4xl font-bold text-accent/30 group-hover:text-accent/50 transition-colors">
+              {project.title[language][0]}
+            </div>
           </div>
-        </div>
+        )}
       </div>
 
       {/* Content */}
@@ -36,7 +48,7 @@ export default function ProjectCard({ project, language }: ProjectCardProps) {
 
         {/* Tags */}
         <div className="mb-4 flex flex-wrap gap-2">
-          {project.technologies.slice(0, 3).map((tech, index) => (
+          {project.technologies.slice(0, 5).map((tech, index) => (
             <span
               key={index}
               className="text-xs px-2 py-1 bg-accent/10 text-accent rounded"
