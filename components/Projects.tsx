@@ -1,36 +1,52 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { ExternalLink, Github } from 'lucide-react'
-import { Button } from '@/components/ui/button'
-import { projects, projectCategories } from '@/data/projects'
-import type { Project } from '@/types'
+import { useEffect, useRef, useState } from "react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { projects } from "@/data/projects";
+import type { Project } from "@/types";
+import { useLanguage } from "@/context/LanguageContext";
+import ProjectCard from "./ProjectCard";
 
-gsap.registerPlugin(ScrollTrigger)
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Projects() {
-  const sectionRef = useRef<HTMLDivElement>(null)
-  const titleRef = useRef<HTMLHeadingElement>(null)
-  const gridRef = useRef<HTMLDivElement>(null)
-  const [activeCategory, setActiveCategory] = useState('All')
-  const [filteredProjects, setFilteredProjects] = useState<Project[]>(projects)
+  const sectionRef = useRef<HTMLDivElement>(null);
+  const titleRef = useRef<HTMLHeadingElement>(null);
+  const gridRef = useRef<HTMLDivElement>(null);
+
+  const { t, language } = useLanguage();
+  const categories = [
+    t("projects.all"),
+    t("projects.web"),
+    t("projects.desktop"),
+    t("projects.mobile"),
+  ];
+
+  const [activeCategory, setActiveCategory] = useState(categories[0]);
+  const [filteredProjects, setFilteredProjects] = useState<Project[]>(projects);
 
   useEffect(() => {
-    if (activeCategory === 'All') {
-      setFilteredProjects(projects)
+    if (activeCategory === t("projects.all")) {
+      setFilteredProjects(projects);
     } else {
       setFilteredProjects(
-        projects.filter((p) => p.category === activeCategory)
-      )
+        projects.filter((p) => {
+          if (activeCategory === t("projects.web"))
+            return p.category === "Web Development";
+          if (activeCategory === t("projects.desktop"))
+            return p.category === "Desktop";
+          if (activeCategory === t("projects.mobile"))
+            return p.category === "Mobile";
+          return true;
+        }),
+      );
     }
-  }, [activeCategory])
+  }, [activeCategory, t]);
 
   useEffect(() => {
-    if (!sectionRef.current || !titleRef.current) return
+    if (!sectionRef.current || !titleRef.current) return;
 
-    // Animate title
     gsap.fromTo(
       titleRef.current,
       { opacity: 0, y: 30 },
@@ -40,15 +56,13 @@ export default function Projects() {
         duration: 0.8,
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: 'top center',
-          end: 'top center',
-          toggleActions: 'play none none none',
+          start: "top center",
+          toggleActions: "play none none none",
         },
-      }
-    )
+      },
+    );
 
-    // Animate project cards
-    const cards = gridRef.current?.querySelectorAll('.project-card')
+    const cards = gridRef.current?.querySelectorAll(".project-card");
     if (cards) {
       gsap.fromTo(
         cards,
@@ -61,14 +75,13 @@ export default function Projects() {
           stagger: 0.1,
           scrollTrigger: {
             trigger: sectionRef.current,
-            start: 'top center',
-            end: 'top center',
-            toggleActions: 'play none none none',
+            start: "top center",
+            toggleActions: "play none none none",
           },
-        }
-      )
+        },
+      );
     }
-  }, [filteredProjects])
+  }, [filteredProjects]);
 
   return (
     <section
@@ -78,25 +91,28 @@ export default function Projects() {
     >
       <div className="max-w-6xl mx-auto">
         <div className="mb-12 text-center">
-          <h2 
+          <h2
             ref={titleRef}
             className="text-4xl sm:text-5xl font-bold text-foreground mb-4 text-balance"
           >
-            Featured <span className="text-accent">Projects</span>
+            {t("projects.title").split(" ")[0]}{" "}
+            <span className="text-accent">
+              {t("projects.title").split(" ").slice(1).join(" ")}
+            </span>
           </h2>
           <div className="w-16 h-1 bg-accent rounded-full mx-auto" />
         </div>
 
         {/* Category Filter */}
         <div className="mb-12 flex flex-wrap gap-3 justify-center">
-          {projectCategories.map((category) => (
+          {categories.map((category) => (
             <button
               key={category}
               onClick={() => setActiveCategory(category)}
               className={`px-6 py-2 rounded-full font-medium transition-all duration-300 ${
                 activeCategory === category
-                  ? 'bg-accent text-accent-foreground'
-                  : 'bg-background border border-border text-foreground hover:border-accent'
+                  ? "bg-accent text-accent-foreground"
+                  : "bg-background border border-border text-foreground hover:border-accent"
               }`}
             >
               {category}
@@ -105,91 +121,19 @@ export default function Projects() {
         </div>
 
         {/* Projects Grid */}
-        <div
-          ref={gridRef}
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
-        >
+        <div ref={gridRef} className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
           {filteredProjects.map((project) => (
-            <div
+            <ProjectCard
               key={project.id}
-              className="project-card group rounded-xl overflow-hidden border border-border hover:border-accent/50 bg-background transition-all duration-300"
-            >
-              {/* Image */}
-              <div className="relative h-48 bg-gradient-to-br from-accent/20 to-accent/5 overflow-hidden flex items-center justify-center">
-                <div className="absolute inset-0 bg-accent/10 group-hover:bg-accent/20 transition-colors duration-300" />
-                <div className="text-center relative z-10">
-                  <div className="text-4xl font-bold text-accent/30 group-hover:text-accent/50 transition-colors">
-                    {project.title.split(' ')[0][0]}
-                  </div>
-                </div>
-              </div>
-
-              {/* Content */}
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-foreground mb-2">
-                  {project.title}
-                </h3>
-                <p className="text-muted-foreground text-sm mb-4 line-clamp-2">
-                  {project.description}
-                </p>
-
-                {/* Tags */}
-                <div className="mb-4 flex flex-wrap gap-2">
-                  {project.technologies.slice(0, 3).map((tech, index) => (
-                    <span
-                      key={index}
-                      className="text-xs px-2 py-1 bg-accent/10 text-accent rounded"
-                    >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-
-                {/* Links */}
-                <div className="flex gap-3">
-                  <a
-                    href={project.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex-1"
-                  >
-                    <Button
-                      size="sm"
-                      variant="outline"
-                      className="w-full text-xs gap-1"
-                    >
-                      <ExternalLink className="w-3 h-3" />
-                      View
-                    </Button>
-                  </a>
-                  {project.github && (
-                    <a
-                      href={project.github}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1"
-                    >
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        className="w-full text-xs gap-1"
-                      >
-                        <Github className="w-3 h-3" />
-                        Code
-                      </Button>
-                    </a>
-                  )}
-                </div>
-              </div>
-            </div>
+              project={project}
+              language={language}
+            />
           ))}
         </div>
 
         {filteredProjects.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">
-              No projects found in this category.
-            </p>
+            <p className="text-muted-foreground">{t("projects.no_projects")}</p>
           </div>
         )}
       </div>

@@ -28,6 +28,14 @@ export const skillsData: SkillCategory[] = [
         name: "Python",
         logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
       },
+      {
+        name: "C#",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/csharp/csharp-original.svg",
+      },
+      {
+        name: "Java",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
+      },
     ],
   },
 
@@ -43,12 +51,16 @@ export const skillsData: SkillCategory[] = [
         logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nextjs/nextjs-original.svg",
       },
       {
-        name: "Vue.js",
-        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vuejs/vuejs-original.svg",
-      },
-      {
         name: "Spring Boot",
         logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/spring/spring-original.svg",
+      },
+      {
+        name: "Django",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/django/django-plain.svg",
+      },
+      {
+        name : "Jetpack Compose",
+        logo : "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/android/android-original.svg",
       },
     ],
   },
