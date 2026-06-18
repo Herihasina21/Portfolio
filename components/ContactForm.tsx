@@ -1,128 +1,130 @@
 "use client";
 
-import { useState } from "react";
-import { Send } from "lucide-react";
+import { useState, useRef } from "react";
+import gsap from "gsap";
+import { Send, User, Mail, MessageSquare, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { useLanguage } from "@/context/LanguageContext";
 import type { ContactFormData } from "@/types";
+import {
+  validateContactForm,
+  validateContactField,
+  type ContactFieldErrors,
+} from "@/utils/validateContact";
 
 interface ContactFormProps {
   className?: string;
 }
 
+type TouchedFields = Partial<Record<keyof ContactFormData, boolean>>;
+
 export default function ContactForm({ className = "" }: ContactFormProps) {
-  const { t } = useLanguage();
-  const [formData, setFormData] = useState<ContactFormData>({
+  var { t } = useLanguage();
+  var { toast } = useToast();
+  var formRef = useRef<HTMLFormElement>(null);
+  var [formData, setFormData] = useState<ContactFormData>({
     name: "",
     email: "",
+    subject: "",
     message: "",
   });
-  const [isLoading, setIsLoading] = useState(false);
-  const [fieldErrors, setFieldErrors] = useState<{
-    name?: string;
-    email?: string;
-    message?: string;
-  }>({});
-  const { toast } = useToast();
+  var [isLoading, setIsLoading] = useState(false);
+  var [fieldErrors, setFieldErrors] = useState<ContactFieldErrors>({});
+  var [touched, setTouched] = useState<TouchedFields>({});
+  var [submitAttempted, setSubmitAttempted] = useState(false);
 
-  // Real-time field validation with translations
-  const validateField = (name: string, value: string) => {
-    const errors = { ...fieldErrors };
-
-    if (name === "name") {
-      if (!value.trim()) {
-        errors.name = `${t("contact.name_label")} ${t("contact.field_required")}`;
-      } else if (value.length < 2) {
-        errors.name = t("contact.name_min_length");
-      } else {
-        delete errors.name;
-      }
-    }
-
-    if (name === "email") {
-      if (!value.trim()) {
-        errors.email = `${t("contact.email_label")} ${t("contact.field_required")}`;
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value)) {
-        errors.email = t("contact.email_invalid");
-      } else {
-        delete errors.email;
-      }
-    }
-
-    if (name === "message") {
-      if (!value.trim()) {
-        errors.message = `${t("contact.message_label")} ${t("contact.field_required")}`;
-      } else if (value.length < 10) {
-        errors.message = t("contact.message_min_length");
-      } else {
-        delete errors.message;
-      }
-    }
-
-    setFieldErrors(errors);
+  var showError = function (field: keyof ContactFormData) {
+    return (touched[field] || submitAttempted) && fieldErrors[field];
   };
 
-  const handleChange = (
+  var shakeField = function (fieldName: string) {
+    if (!formRef.current) return;
+    var el = formRef.current.querySelector(`[data-field="${fieldName}"]`);
+    if (!el) return;
+    gsap.fromTo(
+      el,
+      { x: 0 },
+      {
+        x: 0,
+        duration: 0.45,
+        ease: "power2.out",
+        keyframes: [
+          { x: -8, duration: 0.08 },
+          { x: 8, duration: 0.08 },
+          { x: -4, duration: 0.08 },
+          { x: 0, duration: 0.08 },
+        ],
+      },
+    );
+  };
+
+  var handleBlur = function (
+    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>,
+  ) {
+    var name = e.target.name as keyof ContactFormData;
+    var value = e.target.value;
+    setTouched(function (prev) {
+      return { ...prev, [name]: true };
+    });
+    var error = validateContactField(name, value, t);
+    setFieldErrors(function (prev) {
+      var next = { ...prev };
+      if (error) next[name] = error;
+      else delete next[name];
+      return next;
+    });
+  };
+
+  var handleChange = function (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>,
-  ) => {
-    const { name, value } = e.target;
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    validateField(name, value);
+  ) {
+    var name = e.target.name as keyof ContactFormData;
+    var value = e.target.value;
+    setFormData(function (prev) {
+      return { ...prev, [name]: value };
+    });
+
+    if (touched[name] || submitAttempted) {
+      var error = validateContactField(name, value, t);
+      setFieldErrors(function (prev) {
+        var next = { ...prev };
+        if (error) next[name] = error;
+        else delete next[name];
+        return next;
+      });
+    }
   };
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  var handleSubmit = async function (e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    setSubmitAttempted(true);
+
+    var errors = validateContactForm(formData, t);
+    setFieldErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      var firstErrorField = Object.keys(errors)[0];
+      shakeField(firstErrorField);
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      // Validation with translated messages
-      const errors: string[] = [];
-
-      if (!formData.name.trim()) {
-        errors.push(
-          `${t("contact.name_label")} ${t("contact.field_required")}`,
-        );
-      } else if (formData.name.length < 2) {
-        errors.push(t("contact.name_min_length"));
-      }
-
-      if (!formData.email.trim()) {
-        errors.push(
-          `${t("contact.email_label")} ${t("contact.field_required")}`,
-        );
-      } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
-        errors.push(t("contact.email_invalid"));
-      }
-
-      if (!formData.message.trim()) {
-        errors.push(
-          `${t("contact.message_label")} ${t("contact.field_required")}`,
-        );
-      } else if (formData.message.length < 10) {
-        errors.push(t("contact.message_min_length"));
-      }
-
-      if (errors.length > 0) {
-        toast({
-          title: t("contact.validation_error"),
-          description: errors[0],
-          variant: "destructive",
-        });
-        setIsLoading(false);
-        return;
-      }
-
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise(function (resolve) {
+        setTimeout(resolve, 1000);
+      });
 
       toast({
         title: t("contact.success"),
         description: t("contact.success_description"),
       });
 
-      setFormData({ name: "", email: "", message: "" });
+      setFormData({ name: "", email: "", subject: "", message: "" });
       setFieldErrors({});
+      setTouched({});
+      setSubmitAttempted(false);
     } catch (error) {
       toast({
         title: t("contact.error"),
@@ -134,127 +136,145 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
     }
   };
 
+  var inputClass = function (field: keyof ContactFormData, hasValue: boolean) {
+    if (showError(field)) {
+      return "border-red-500/60 focus:border-red-500 focus:ring-red-500/20";
+    }
+    if (hasValue && !fieldErrors[field]) {
+      return "border-green-500/40 focus:border-green-500 focus:ring-green-500/20";
+    }
+    return "border-border/60 focus:border-accent focus:ring-accent/20";
+  };
+
+  var fields: Array<{
+    id: keyof ContactFormData;
+    label: string;
+    placeholder: string;
+    type: string;
+    icon: typeof User;
+    multiline?: boolean;
+    maxLength?: number;
+  }> = [
+    {
+      id: "name",
+      label: t("contact.name_label"),
+      placeholder: t("contact.name_placeholder"),
+      type: "text",
+      icon: User,
+      maxLength: 80,
+    },
+    {
+      id: "email",
+      label: t("contact.email_label"),
+      placeholder: t("contact.email_placeholder"),
+      type: "email",
+      icon: Mail,
+      maxLength: 120,
+    },
+    {
+      id: "subject",
+      label: t("contact.subject_label"),
+      placeholder: t("contact.subject_placeholder"),
+      type: "text",
+      icon: FileText,
+      maxLength: 120,
+    },
+  ];
+
   return (
     <form
+      ref={formRef}
       onSubmit={handleSubmit}
-      className={`fade-in-item space-y-6 bg-gradient-to-br from-card/40 to-card/20 backdrop-blur-lg p-8 rounded-2xl border border-border/50 hover:border-accent/20 transition-all duration-300 shadow-lg relative overflow-hidden group ${className}`}
+      noValidate
+      className={`fade-in-item portfolio-card p-6 sm:p-8 space-y-5 ${className}`}
     >
-      {/* Animated gradient background on hover */}
-      <div className="absolute inset-0 bg-gradient-to-br from-accent/0 via-accent/0 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500 -z-10" />
-
       <div>
-        <div className="flex items-center justify-between mb-2">
-          <label
-            htmlFor="name"
-            className="block text-sm font-semibold text-foreground"
-          >
-            {t("contact.name_label")}
-          </label>
-          {formData.name && !fieldErrors.name && (
-            <span className="text-xs text-green-500 flex items-center gap-1">
-              ✓ {t("contact.valid")}
-            </span>
-          )}
-        </div>
-        <input
-          type="text"
-          id="name"
-          name="name"
-          value={formData.name}
-          onChange={handleChange}
-          placeholder={t("contact.name_placeholder")}
-          className={`w-full px-4 py-3 rounded-lg bg-background/50 backdrop-blur-sm border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all ${
-            fieldErrors.name
-              ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20"
-              : formData.name && !fieldErrors.name
-                ? "border-green-500/50 focus:border-green-500 focus:ring-green-500/20"
-                : "border-border focus:border-accent focus:ring-accent/20"
-          }`}
-        />
-        {fieldErrors.name && (
-          <p className="text-xs text-red-500 mt-1">{fieldErrors.name}</p>
-        )}
+        <h3 className="text-xl font-bold text-foreground mb-1">
+          {t("contact.form_title")}
+        </h3>
+        <p className="text-sm text-muted-foreground">{t("contact.form_subtitle")}</p>
       </div>
 
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <label
-            htmlFor="email"
-            className="block text-sm font-semibold text-foreground"
-          >
-            {t("contact.email_label")}
-          </label>
-          {formData.email && !fieldErrors.email && (
-            <span className="text-xs text-green-500 flex items-center gap-1">
-              ✓ {t("contact.valid")}
-            </span>
-          )}
-        </div>
-        <input
-          type="email"
-          id="email"
-          name="email"
-          value={formData.email}
-          onChange={handleChange}
-          placeholder={t("contact.email_placeholder")}
-          className={`w-full px-4 py-3 rounded-lg bg-background/50 backdrop-blur-sm border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all ${
-            fieldErrors.email
-              ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20"
-              : formData.email && !fieldErrors.email
-                ? "border-green-500/50 focus:border-green-500 focus:ring-green-500/20"
-                : "border-border focus:border-accent focus:ring-accent/20"
-          }`}
-        />
-        {fieldErrors.email && (
-          <p className="text-xs text-red-500 mt-1">{fieldErrors.email}</p>
-        )}
-      </div>
-
-      <div>
-        <div className="flex items-center justify-between mb-2">
-          <label
-            htmlFor="message"
-            className="block text-sm font-semibold text-foreground"
-          >
-            {t("contact.message_label")}
-          </label>
-          {formData.message && (
-            <span
-              className={`text-xs ${
-                fieldErrors.message ? "text-red-500" : "text-green-500"
-              }`}
+      {fields.map(function (field) {
+        var Icon = field.icon;
+        var value = formData[field.id];
+        var error = showError(field.id);
+        return (
+          <div key={field.id} data-field={field.id}>
+            <label
+              htmlFor={field.id}
+              className="block text-sm font-medium text-foreground mb-2"
             >
-              {formData.message.length}/10+ {t("contact.char_count")}
-            </span>
-          )}
+              {field.label}
+              <span className="text-red-400 ml-1">*</span>
+            </label>
+            <div className="relative">
+              <Icon className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input
+                type={field.type}
+                id={field.id}
+                name={field.id}
+                value={value}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                placeholder={field.placeholder}
+                maxLength={field.maxLength}
+                aria-invalid={!!error}
+                aria-describedby={error ? `${field.id}-error` : undefined}
+                required
+                className={`w-full pl-10 pr-4 py-3 rounded-xl bg-background/50 border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all ${inputClass(field.id, !!value)}`}
+              />
+            </div>
+            {error && (
+              <p id={`${field.id}-error`} className="text-xs text-red-400 mt-1.5">
+                {fieldErrors[field.id]}
+              </p>
+            )}
+          </div>
+        );
+      })}
+
+      <div data-field="message">
+        <div className="flex items-center justify-between mb-2">
+          <label htmlFor="message" className="text-sm font-medium text-foreground">
+            {t("contact.message_label")}
+            <span className="text-red-400 ml-1">*</span>
+          </label>
+          <span className="text-xs text-muted-foreground">
+            {formData.message.length}/2000
+          </span>
         </div>
-        <textarea
-          id="message"
-          name="message"
-          value={formData.message}
-          onChange={handleChange}
-          placeholder={t("contact.message_placeholder")}
-          rows={5}
-          className={`w-full px-4 py-3 rounded-lg bg-background/50 backdrop-blur-sm border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all resize-none ${
-            fieldErrors.message
-              ? "border-red-500/50 focus:border-red-500 focus:ring-red-500/20"
-              : formData.message && !fieldErrors.message
-                ? "border-green-500/50 focus:border-green-500 focus:ring-green-500/20"
-                : "border-border focus:border-accent focus:ring-accent/20"
-          }`}
-        />
-        {fieldErrors.message && (
-          <p className="text-xs text-red-500 mt-1">{fieldErrors.message}</p>
+        <div className="relative">
+          <MessageSquare className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
+          <textarea
+            id="message"
+            name="message"
+            value={formData.message}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            placeholder={t("contact.message_placeholder")}
+            rows={5}
+            maxLength={2000}
+            aria-invalid={!!showError("message")}
+            aria-describedby={showError("message") ? "message-error" : undefined}
+            required
+            className={`w-full pl-10 pr-4 py-3 rounded-xl bg-background/50 border text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 transition-all resize-none ${inputClass("message", !!formData.message)}`}
+          />
+        </div>
+        {showError("message") && (
+          <p id="message-error" className="text-xs text-red-400 mt-1.5">
+            {fieldErrors.message}
+          </p>
         )}
       </div>
 
       <Button
         type="submit"
-        disabled={isLoading || Object.keys(fieldErrors).length > 0}
-        className="w-full bg-accent hover:bg-accent/90 disabled:bg-muted disabled:text-muted-foreground disabled:cursor-not-allowed text-accent-foreground font-semibold py-3 rounded-lg group transition-all duration-300 shadow-lg hover:shadow-xl"
+        disabled={isLoading}
+        className="w-full bg-accent hover:bg-accent/90 disabled:opacity-60 text-accent-foreground font-semibold py-3 rounded-xl gap-2"
       >
         {isLoading ? t("contact.sending") : t("contact.send")}
-        <Send className="w-4 h-4 ml-2 group-hover:translate-x-1 transition-transform" />
+        <Send className="w-4 h-4" />
       </Button>
     </form>
   );

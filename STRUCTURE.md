@@ -1,259 +1,216 @@
 # Structure du Projet Portfolio
 
-## 📁 Arborescence Complète
+Portfolio one-page de **Herihasina Michael Rakotoarivony** — Next.js 16, React 19, Tailwind CSS v4, GSAP, i18n FR/EN.
+
+---
+
+## Arborescence
 
 ```
-portfolio-project/
+Portfolio/
 │
-├── 📂 app/                              # Application Next.js 16 (App Router)
-│   ├── layout.tsx                       # Layout racine avec métadonnées SEO
-│   ├── page.tsx                         # Page d'accueil principale
-│   ├── providers.tsx                    # Providers: ThemeProvider + LanguageProvider (Client)
-│   ├── globals.css                      # Styles globaux + scrollbar personnalisée
-│   ├── animations.css                   # Animations GSAP + Tailwind
-│   ├── icon.svg                         # Favicon
-│   └── apple-icon.png
+├── app/
+│   ├── layout.tsx              # Layout racine, métadonnées SEO, viewport
+│   ├── page.tsx                # Page d'accueil (Navbar → sections → Footer)
+│   ├── providers.tsx           # ThemeProvider, LanguageProvider, SmoothScroll, Toaster
+│   ├── globals.css             # Variables thème, utilitaires Tailwind, styles Hero
+│   └── animations.css          # Keyframes (fade, slide, float) + reduced-motion
 │
-├── 📂 components/                       # Composants React réutilisables
-│   ├── Navbar.tsx                       # Navigation avec langue/thème + détection scroll
-│   ├── Hero.tsx                         # Section hero avec animations GSAP
-│   ├── About.tsx                        # Section "À Propos"
-│   ├── Skills.tsx                       # Section Compétences avec onglets (4 catégories)
-│   ├── Projects.tsx                     # Section Projets avec filtre + ScrollTrigger
-│   ├── Contact.tsx                      # Formulaire de contact EmailJS
-│   ├── Footer.tsx                       # Pied de page
-│   ├── Services.tsx                     # Ancien composant (remplacé par Skills)
-│   └── 📂 ui/                           # Composants shadcn/ui
-│       ├── button.tsx                   # Boutons réutilisables
-│       ├── card.tsx                     # Cartes/conteneurs
-│       ├── accordion.tsx                # Accordion replié/déplié
-│       ├── alert.tsx                    # Alertes
-│       ├── badge.tsx                    # Labels/badges
-│       ├── checkbox.tsx                 # Cases à cocher
-│       ├── dialog.tsx                   # Modales/popups
-│       ├── dropdown-menu.tsx            # Menus déroulants
-│       ├── form.tsx                     # Gestion formulaires React Hook Form
-│       ├── input.tsx                    # Champs de texte
-│       ├── label.tsx                    # Labels
-│       ├── popover.tsx                  # Petits popups
-│       ├── radio-group.tsx              # Boutons radio
-│       ├── select.tsx                   # Sélecteurs
-│       ├── skeleton.tsx                 # Placeholders de chargement
-│       ├── switch.tsx                   # Interrupteurs
-│       ├── tabs.tsx                     # Onglets (utilisé dans Skills)
-│       ├── textarea.tsx                 # Zones texte multilignes
-│       ├── tooltip.tsx                  # Infobulle au survol
-│       └── ... (autres composants)
+├── components/
+│   ├── Navbar.tsx              # Nav, thème, langue, lien CV, section active
+│   ├── LanguageSelector.tsx    # Dropdown FR/EN
+│   ├── Hero.tsx                # Hero + portrait PNG + animations GSAP
+│   ├── About.tsx               # Présentation, stats animées, timeline
+│   ├── ExperienceTimeline.tsx  # Timeline parcours (About)
+│   ├── Skills.tsx              # Onglets Frontend/Backend/Outils/Design + filtres GSAP
+│   ├── TechSkillCard.tsx       # Carte compétence avec glow
+│   ├── Projects.tsx            # Filtres Tous/Web/Desktop/Mobile + grille GSAP
+│   ├── ProjectCard.tsx         # Carte projet
+│   ├── ProjectModal.tsx        # Modal détail projet (dialog)
+│   ├── Contact.tsx             # Section contact (orchestration)
+│   ├── ContactForm.tsx         # Formulaire + validation + toast
+│   ├── ContactInfo.tsx         # Cartes email, téléphone, localisation
+│   ├── SectionHeader.tsx       # Titre + sous-titre de section réutilisable
+│   ├── Footer.tsx              # Copyright dynamique (année courante)
+│   ├── SmoothScroll.tsx        # Smooth scroll GSAP (providers)
+│   ├── theme-provider.tsx      # Wrapper next-themes
+│   └── ui/                     # shadcn/ui — composants réellement utilisés
+│       ├── button.tsx
+│       ├── dialog.tsx
+│       ├── toast.tsx
+│       └── toaster.tsx
 │
-├── 📂 context/                          # Contextes React
-│   └── LanguageContext.tsx              # Gestion i18n (EN/FR) avec localStorage
+├── context/
+│   └── LanguageContext.tsx     # i18n : language, setLanguage, t()
 │
-├── 📂 hooks/                            # Hooks React personnalisés
-│   ├── useActiveSection.ts              # Détecte section visible au scroll
-│   ├── use-mobile.ts                    # Hook détecteur de mobile
-│   └── use-toast.ts                     # Hook notifications toast
+├── hooks/
+│   ├── useActiveSection.ts     # Section visible au scroll (Navbar)
+│   └── use-toast.ts            # Notifications toast (ContactForm)
 │
-├── 📂 data/                             # Données statiques
-│   ├── projects.ts                      # Array d'objets Project
-│   └── translations.ts                  # (optionnel) Traductions i18n
+├── locales/
+│   ├── en.json                 # Traductions anglaises
+│   └── fr.json                 # Traductions françaises
 │
-├── 📂 types/                            # Interfaces TypeScript
-│   └── index.ts                         # Types: Project, Skill, Language, etc.
+├── data/
+│   ├── projects.ts             # Liste des projets
+│   ├── skills.ts               # Compétences par catégorie
+│   ├── experience.ts           # Parcours professionnel (timeline)
+│   └── stats.ts                # Statistiques About (années, projets…)
 │
-├── 📂 utils/                            # Fonctions utilitaires
-│   ├── gsapAnimations.ts                # Animations GSAP réutilisables
-│   └── cn.ts                            # Fonction classNames (Tailwind)
+├── constants/
+│   └── social.ts               # Liens GitHub, LinkedIn, email
 │
-├── 📂 public/                           # Ressources statiques (images, fonts)
-│   ├── icon-light-32x32.png
-│   ├── icon-dark-32x32.png
+├── types/
+│   └── index.ts                # Project, Skill, Experience, etc.
+│
+├── utils/
+│   ├── gsapAnimations.ts       # Animations GSAP réutilisables + smooth scroll
+│   ├── filterAnimations.ts     # Animations filtres Skills / Projects
+│   ├── motion.ts               # prefersReducedMotion, shouldAnimateOnScroll
+│   └── validateContact.ts      # Validation champs formulaire contact
+│
+├── lib/
+│   └── utils.ts                # cn() — fusion classes Tailwind
+│
+├── public/
 │   ├── icon.svg
-│   ├── apple-icon.png
-│   └── (images projets, logos, etc.)
+│   └── assets/
+│       ├── herihasina.png      # Portrait Hero (PNG transparent)
+│       ├── salary.png
+│       ├── sehatra.png
+│       └── smarttrack.png
 │
-├── 📂 styles/                           # Styles additionnels (si besoin)
-│   └── (généralement dans globals.css)
-│
-└── 📄 Fichiers de Configuration
-    ├── package.json                     # Dépendances + scripts
-    ├── tsconfig.json                    # Configuration TypeScript
-    ├── tailwind.config.mjs               # Configuration Tailwind CSS v4
-    ├── next.config.mjs                  # Configuration Next.js
-    ├── .eslintrc.json                   # Configuration ESLint
+└── Configuration
+    ├── package.json
+    ├── tsconfig.json
+    ├── next.config.mjs
+    ├── tailwind.config.mjs
+    ├── postcss.config.mjs
+    ├── components.json         # Config shadcn/ui
     └── .gitignore
 ```
 
 ---
 
-## 🎨 Détail du dossier `components/ui/`
+## Page d'accueil (`app/page.tsx`)
 
-Le dossier `ui/` contient les **composants shadcn/ui** - une collection de composants React non stylisés, accessible et customisable basée sur Radix UI.
+Ordre des sections :
 
-### **1️⃣ Composants de Formulaire**
-| Composant | Usage | Utilisé? |
-|-----------|-------|----------|
-| `input.tsx` | Champs de texte simples | ✅ Contact |
-| `textarea.tsx` | Zones texte multilignes | ✅ Contact |
-| `form.tsx` | Gestion React Hook Form | ✅ Contact |
-| `label.tsx` | Labels accessibles | ✅ Contact |
-| `checkbox.tsx` | Cases à cocher | ❌ |
-| `radio-group.tsx` | Boutons radio | ❌ |
-| `select.tsx` | Sélecteurs déroulants | ❌ |
-| `switch.tsx` | Interrupteurs on/off | ❌ |
-
-### **2️⃣ Composants d'Affichage**
-| Composant | Usage | Utilisé? |
-|-----------|-------|----------|
-| `button.tsx` | Boutons réutilisables | ✅ Hero, Skills, Projects |
-| `card.tsx` | Conteneurs cartes | ✅ Projects, Skills |
-| `badge.tsx` | Petits labels/tags | ✅ Projects |
-| `alert.tsx` | Messages d'alerte | ❌ |
-| `skeleton.tsx` | Placeholders chargement | ❌ |
-| `empty.tsx` | État vide | ❌ |
-
-### **3️⃣ Composants de Navigation**
-| Composant | Usage | Utilisé? |
-|-----------|-------|----------|
-| `tabs.tsx` | Onglets | ✅ Skills (Languages/Frameworks/SGBD/Outils) |
-| `dropdown-menu.tsx` | Menus déroulants | ❌ |
-| `pagination.tsx` | Navigation pages | ❌ |
-| `breadcrumb.tsx` | Fil d'Ariane | ❌ |
-
-### **4️⃣ Composants de Dialogue**
-| Composant | Usage | Utilisé? |
-|-----------|-------|----------|
-| `dialog.tsx` | Modales/popups | ❌ |
-| `popover.tsx` | Petits popups | ❌ |
-| `hover-card.tsx` | Carte au survol | ❌ |
-| `sheet.tsx` | Drawer latéral | ❌ |
-| `tooltip.tsx` | Infobulle survol | ❌ |
-
-### **5️⃣ Nouveaux Composants (Shadcn v1.7+)**
-| Composant | Usage | Utilisé? |
-|-----------|-------|----------|
-| `spinner.tsx` | Indicateur chargement | ❌ |
-| `button-group.tsx` | Groupe de boutons | ❌ |
-| `field.tsx` | Champs groupés | ❌ |
-| `input-group.tsx` | Groupes inputs | ❌ |
-| `kbd.tsx` | Affichage touches clavier | ❌ |
-| `item.tsx` | Éléments listés | ❌ |
+1. **Navbar** — `#home`, `#about`, `#skills`, `#projects`, `#contact`
+2. **Hero** — `#home`
+3. **About** — `#about`
+4. **Skills** — `#skills`
+5. **Projects** — `#projects`
+6. **Contact** — `#contact`
+7. **Footer** — copyright
 
 ---
 
-## 🔄 Flux de Données & Architecture
+## Composants `ui/` (shadcn)
 
-### **Navigation & Scroll Detection**
+Seuls 4 composants sont conservés après nettoyage :
+
+| Composant    | Utilisé dans                                      |
+|--------------|---------------------------------------------------|
+| `button.tsx` | Hero, Navbar, ContactForm, ProjectModal           |
+| `dialog.tsx` | ProjectModal                                      |
+| `toast.tsx`  | Système de notifications                          |
+| `toaster.tsx`| `app/providers.tsx`                               |
+
+---
+
+## Flux de données
+
+### Navigation
+
 ```
 Navbar.tsx
-├── useActiveSection() → Détecte section visible
-├── useLanguage() → Récupère langue actuelle
-├── useTheme() → Récupère thème (light/dark)
-└── Affiche liens actifs en couleur accent
+├── useActiveSection()   → surligne la section visible
+├── useLanguage()        → traductions
+├── useTheme()           → thème clair / sombre
+└── LanguageSelector     → bascule FR / EN
 ```
 
-### **Traductions (i18n)**
+### i18n
+
 ```
-LanguageContext.tsx
-├── État: language (en/fr) + setLanguage()
-├── Fonction: t(key) → retourne traduction
-├── Stockage: localStorage
-└── Fallback: Traductions par défaut anglaises
+locales/en.json + locales/fr.json
+        ↓
+LanguageContext.tsx  →  t('clé')  →  texte traduit
+        ↓
+localStorage (persistance langue)
 ```
 
-### **Animations**
-```
-Composants avec animations GSAP:
-├── Hero.tsx → Character stagger + fade-in
-├── Projects.tsx → ScrollTrigger (fade + scale)
-└── Skills.tsx → Fade-in au scroll
+### Animations GSAP
 
-Classe CSS: .scroll-indicator
-└── Animée avec: animate-bounce (Tailwind)
-```
-
-### **Contenu Statique**
-```
-data/projects.ts
-└── Array[Project]
-    ├── id, title, description
-    ├── category (Web/Mobile/Design)
-    ├── technologies
-    └── image, link
-
-types/index.ts
-├── interface Project {}
-├── interface Skill {}
-├── type Language = 'en' | 'fr'
-└── interface Translations {}
-```
+| Fichier / composant   | Rôle                                              |
+|-----------------------|---------------------------------------------------|
+| `Hero.tsx`            | Timeline entrée (texte, portrait, orbes, float)   |
+| `About.tsx`           | Compteurs stats, fade-in scroll                   |
+| `Skills.tsx`          | Filtres onglets via `filterAnimations.ts`         |
+| `Projects.tsx`        | Filtres catégorie + grille                        |
+| `Contact.tsx`         | Fade-in cartes et formulaire                      |
+| `SmoothScroll.tsx`    | Défilement fluide global                          |
+| `utils/motion.ts`     | Désactive animations si `prefers-reduced-motion`  |
 
 ---
 
-## 📦 Dépendances Principales
+## Dépendances principales
 
-```json
-{
-  "dependencies": {
-    "next": "^16.0.0",
-    "react": "^19.0.0",
-    "tailwindcss": "^4.0.0",
-    "gsap": "^3.12.3",
-    "react-icons": "^5.0.0",
-    "next-themes": "^0.2.1",
-    "emailjs-com": "^3.2.0",
-    "react-hook-form": "^7.x",
-    "@hookform/resolvers": "^3.x",
-    "clsx": "^2.0.0",
-    "class-variance-authority": "^0.7.0"
-  },
-  "devDependencies": {
-    "typescript": "^5.x",
-    "tailwindcss": "^4.0.0",
-    "@types/react": "^19.0.0"
-  }
-}
-```
+| Package           | Usage                                      |
+|-------------------|--------------------------------------------|
+| `next` 16         | Framework, App Router, Image               |
+| `react` 19        | UI                                         |
+| `tailwindcss` 4   | Styles                                     |
+| `gsap`            | Animations Hero, sections, filtres         |
+| `next-themes`     | Thème clair / sombre                       |
+| `lucide-react`    | Icônes                                     |
+| `@radix-ui/react-dialog` | Modal projets                       |
+| `@radix-ui/react-toast`  | Toasts contact                       |
+| `emailjs-com`     | Contact (à brancher — envoi simulé)        |
+
+> Note : plusieurs packages `@radix-ui/*` restent dans `package.json` suite au nettoyage ui ; un nettoyage des dépendances est possible ultérieurement.
 
 ---
 
-## 🎯 Points Clés de Compréhension
+## Composants Client vs Server
 
-### **1. Composants Client vs Server**
-- **Client (`'use client'`):** Navbar, Hero, Skills, Projects, Contact (besoin hooks/context)
-- **Server:** About, Footer (contenu statique)
+| Client (`'use client'`) | Server |
+|-------------------------|--------|
+| Navbar, Hero, About, Skills, Projects, Contact, Footer | `app/page.tsx`, `app/layout.tsx` |
 
-### **2. Animations**
-- **GSAP:** Hero (character stagger), Projects (ScrollTrigger)
-- **Tailwind:** animate-bounce (scroll indicator)
-- **CSS Custom:** animations.css (float)
-
-### **3. Accessibilité**
-- Tous les boutons ont type/aria-label
-- Couleurs respectent WCAG (contrast 4.5:1)
-- Scrollbar customisée mais accessible
-
-### **4. Performance**
-- Images optimisées (Next.js Image)
-- Lazy loading projects avec IntersectionObserver
-- CSS-in-JS minimal (Tailwind)
-- GSAP avec context pour cleanup
+Toutes les sections interactives (hooks, GSAP, context) sont en Client Components.
 
 ---
 
-## 🚀 Pour Ajouter une Nouvelle Section
+## Fichiers à compléter
 
-1. **Créer le composant:** `components/NewSection.tsx` ('use client')
-2. **Importer dans:** `app/page.tsx`
-3. **Ajouter au Navbar:** navLinks array dans `Navbar.tsx`
-4. **Ajouter traductions:** Dans `LanguageContext.tsx`
-5. **Ajouter id:** `<section id="new-section">` pour scroll detection
+| Fichier                         | Statut                          |
+|---------------------------------|---------------------------------|
+| `public/cv.pdf`                 | Manquant — lien Navbar présent  |
+| `public/icon-light-32x32.png`   | Référencé dans layout, absent   |
+| `public/icon-dark-32x32.png`    | Référencé dans layout, absent   |
+| `public/apple-icon.png`         | Référencé dans layout, absent   |
+| Images projets (`portfolio.png`, `heatmap.png`, …) | Partiellement absentes |
+| Liens projets `example.com`     | Placeholders dans `data/projects.ts` |
 
 ---
 
-## 📝 Notes Importantes
+## Ajouter une nouvelle section
 
-- **Scrollbar:** Customisée dans `globals.css` (couleur accent, width: 8px)
-- **Thème:** Dark mode par défaut, toggle dans Navbar
-- **Langue:** EN/FR, stockée dans localStorage, par défaut: navigateur
-- **Animations:** ScrollTrigger désactivé sur mobile (<768px) pour perf
-- **Form Contact:** EmailJS prêt, besoin PUBLIC_KEY d'EmailJS pour fonctionner
+1. Créer `components/MaSection.tsx` (`'use client'` si hooks/GSAP)
+2. Ajouter `<MaSection />` dans `app/page.tsx`
+3. Ajouter le lien dans `Navbar.tsx` (`navLinks`)
+4. Ajouter les clés dans `locales/en.json` et `locales/fr.json`
+5. Mettre `id="ma-section"` sur la balise `<section>` pour la détection scroll
+
+---
+
+## Notes
+
+- **Thème** : sombre par défaut (`enableSystem: false`), toggle dans Navbar
+- **Langue** : FR / EN, persistée en `localStorage`
+- **Contact** : validation locale + toast succès/erreur ; EmailJS non connecté
+- **Hero** : portrait PNG sans fond dans `public/assets/herihasina.png`
+- **Footer** : `© {année} Herihasina Michael Rakotoarivony` + droits réservés
+- **Branche de travail** : `feat/phase-1-polish` (polish UI, Hero, nettoyage)

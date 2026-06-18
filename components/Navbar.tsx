@@ -2,26 +2,31 @@
 
 import { useState, useEffect } from 'react'
 import { useTheme } from 'next-themes'
-import { Menu, X, Moon, Sun, Globe } from 'lucide-react'
+import { Menu, X, Moon, Sun, Download } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import LanguageSelector from '@/components/LanguageSelector'
 import { useLanguage } from '@/context/LanguageContext'
 import { useActiveSection } from '@/hooks/useActiveSection'
 
 export default function Navbar() {
-  const [isOpen, setIsOpen] = useState(false)
-  const [mounted, setMounted] = useState(false)
-  const { theme, setTheme } = useTheme()
-  const activeSection = useActiveSection()
-  
-  const { language, setLanguage, t } = useLanguage()
+  var [isOpen, setIsOpen] = useState(false)
+  var [isScrolled, setIsScrolled] = useState(false)
+  var { theme, setTheme } = useTheme()
+  var activeSection = useActiveSection()
+  var { t } = useLanguage()
 
-  const [showLangMenu, setShowLangMenu] = useState(false)
+  useEffect(function () {
+    var onScroll = function () {
+      setIsScrolled(window.scrollY > 50)
+    }
 
-  useEffect(() => {
-    setMounted(true)
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return function () {
+      window.removeEventListener('scroll', onScroll)
+    }
   }, [])
 
-  const navLinks = [
+  var navLinks = [
     { href: '#home', label: t('nav.home') },
     { href: '#about', label: t('nav.about') },
     { href: '#skills', label: t('nav.skills') },
@@ -29,137 +34,132 @@ export default function Navbar() {
     { href: '#contact', label: t('nav.contact') },
   ]
 
+  var isDark = theme !== 'light'
+
   return (
-    <nav className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-md border-b border-border">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
-          {/* Logo */}
-          <a href="#home" className="flex items-center space-x-2 group">
-            <div className="w-8 h-8 bg-accent rounded-lg flex items-center justify-center">
-              <span className="text-accent-foreground font-bold text-lg">H.</span>
+    <nav
+      className={`fixed top-0 left-0 right-0 z-50 border-b transition-all duration-300 ${
+        isScrolled
+          ? 'bg-background/95 backdrop-blur-xl border-border shadow-lg shadow-black/10'
+          : 'bg-background/70 backdrop-blur-md border-border/40'
+      }`}
+    >
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-14 sm:h-16">
+          <a href="#home" className="flex items-center gap-2 sm:gap-3 group min-w-0">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full bg-accent/20 border border-accent/30 flex items-center justify-center shrink-0">
+              <span className="text-accent font-bold text-xs sm:text-sm">HM</span>
             </div>
-            <span className="hidden sm:block font-bold text-foreground group-hover:text-accent transition-colors">
-              {t('nav.name')}
+            <span className="hidden sm:block font-semibold text-foreground truncate group-hover:text-accent transition-colors text-sm sm:text-base">
+              Herihasina Michael
             </span>
           </a>
 
-          {/* Desktop Navigation */}
-          <div className="hidden md:flex items-center space-x-8">
-            {navLinks.map((link) => {
-              const sectionId = link.href.substring(1)
-              const isActive = activeSection === sectionId
+          <div className="hidden lg:flex items-center gap-1">
+            {navLinks.map(function (link) {
+              var sectionId = link.href.substring(1)
+              var isActive = activeSection === sectionId
               return (
                 <a
                   key={link.href}
                   href={link.href}
-                  className={`text-sm font-medium transition-colors duration-300 ${
+                  className={`relative px-3 xl:px-4 py-2 text-sm font-medium rounded-lg transition-colors duration-300 ${
                     isActive
-                      ? 'text-accent font-semibold'
-                      : 'text-foreground hover:text-accent'
+                      ? 'text-foreground bg-card/80'
+                      : 'text-muted-foreground hover:text-foreground hover:bg-card/40'
                   }`}
                 >
                   {link.label}
+                  {isActive && (
+                    <span className="absolute bottom-0 left-3 right-3 h-0.5 bg-accent rounded-full" />
+                  )}
                 </a>
               )
             })}
           </div>
 
-          {/* Theme Toggle & Language & Mobile Menu */}
-          <div className="flex items-center space-x-4">
-            {mounted && (
-              <>
-                {/* Language Switcher */}
-                <div className="relative">
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    onClick={() => setShowLangMenu(!showLangMenu)}
-                    className="hover:bg-accent/10"
-                    title="Change language"
-                  >
-                    <Globe className="w-5 h-5" />
-                  </Button>
-                  {showLangMenu && (
-                    <div className="absolute right-0 mt-2 w-24 bg-card border border-border rounded-lg shadow-lg z-50">
-                      <button
-                        onClick={() => {
-                          setLanguage('en')
-                          setShowLangMenu(false)
-                        }}
-                        className={`w-full px-4 py-2 text-sm text-left hover:bg-accent/10 transition-colors ${
-                          language === 'en' ? 'text-accent font-semibold' : 'text-foreground'
-                        }`}
-                      >
-                        English
-                      </button>
-                      <button
-                        onClick={() => {
-                          setLanguage('fr')
-                          setShowLangMenu(false)
-                        }}
-                        className={`w-full px-4 py-2 text-sm text-left hover:bg-accent/10 transition-colors border-t border-border ${
-                          language === 'fr' ? 'text-accent font-semibold' : 'text-foreground'
-                        }`}
-                      >
-                        Français
-                      </button>
-                    </div>
-                  )}
-                </div>
+          <div className="flex items-center gap-1.5 sm:gap-2">
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={function () {
+                setTheme(isDark ? 'light' : 'dark')
+              }}
+              className="hover:bg-card/80 rounded-full h-8 w-8 sm:h-9 sm:w-9"
+              aria-label="Toggle theme"
+              suppressHydrationWarning
+            >
+              <Sun
+                className={`w-4 h-4 ${isDark ? 'block' : 'hidden'}`}
+                suppressHydrationWarning
+              />
+              <Moon
+                className={`w-4 h-4 ${isDark ? 'hidden' : 'block'}`}
+                suppressHydrationWarning
+              />
+            </Button>
 
-                {/* Theme Toggle */}
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-                  className="hover:bg-accent/10"
-                >
-                  {theme === 'dark' ? (
-                    <Sun className="w-5 h-5" />
-                  ) : (
-                    <Moon className="w-5 h-5" />
-                  )}
-                </Button>
-              </>
-            )}
+            <LanguageSelector className="hidden sm:block" />
 
-            {/* Mobile Menu Button */}
+            <a href="/cv.pdf" download className="hidden md:block">
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full gap-2 border-border/60 hover:border-accent/40 text-xs sm:text-sm h-8 sm:h-9"
+              >
+                <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                <span className="hidden lg:inline">{t('nav.download_cv')}</span>
+                <span className="lg:hidden">CV</span>
+              </Button>
+            </a>
+
             <button
-              className="md:hidden p-2 hover:bg-accent/10 rounded-lg transition-colors"
-              onClick={() => setIsOpen(!isOpen)}
+              type="button"
+              className="lg:hidden p-2 hover:bg-card/80 rounded-lg transition-colors"
+              onClick={function () {
+                setIsOpen(!isOpen)
+              }}
               aria-label="Toggle menu"
             >
-              {isOpen ? (
-                <X className="w-5 h-5" />
-              ) : (
-                <Menu className="w-5 h-5" />
-              )}
+              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
           </div>
         </div>
 
-        {/* Mobile Menu */}
         {isOpen && (
-          <div className="md:hidden border-t border-border bg-background">
-            <div className="px-2 pt-2 pb-3 space-y-1">
-              {navLinks.map((link) => {
-                const sectionId = link.href.substring(1)
-                const isActive = activeSection === sectionId
+          <div className="lg:hidden border-t border-border/60 bg-background/95 backdrop-blur-xl">
+            <div className="px-2 pt-2 pb-4 space-y-1">
+              {navLinks.map(function (link) {
+                var sectionId = link.href.substring(1)
+                var isActive = activeSection === sectionId
                 return (
                   <a
                     key={link.href}
                     href={link.href}
-                    className={`block px-3 py-2 rounded-lg transition-colors text-sm font-medium ${
+                    className={`block px-3 py-2.5 rounded-xl transition-colors text-sm font-medium ${
                       isActive
-                        ? 'bg-accent text-accent-foreground font-semibold'
-                        : 'text-foreground hover:bg-accent/10 hover:text-accent'
+                        ? 'bg-accent text-accent-foreground'
+                        : 'text-muted-foreground hover:bg-card/80 hover:text-foreground'
                     }`}
-                    onClick={() => setIsOpen(false)}
+                    onClick={function () {
+                      setIsOpen(false)
+                    }}
                   >
                     {link.label}
                   </a>
                 )
               })}
+
+              <div className="px-3 py-3 sm:hidden">
+                <LanguageSelector />
+              </div>
+
+              <a href="/cv.pdf" download className="block px-3 py-2.5 mt-1 md:hidden">
+                <Button variant="outline" className="w-full rounded-xl gap-2">
+                  <Download className="w-4 h-4" />
+                  {t('nav.download_cv')}
+                </Button>
+              </a>
             </div>
           </div>
         )}

@@ -72,29 +72,39 @@ export const setupHoverAnimation = (selector: string) => {
   })
 }
 
-// Setup smooth scroll
+// Setup smooth scroll (native, no premium GSAP plugin)
 export const setupSmoothScroll = () => {
+  const NAV_OFFSET = 64
   const links = document.querySelectorAll('a[href^="#"]')
-  
-  links.forEach((link) => {
-    link.addEventListener('click', (e) => {
-      e.preventDefault()
-      const href = link.getAttribute('href')
-      if (!href) return
-      
-      const target = document.querySelector(href)
-      if (!target) return
-      
-      gsap.to(window, {
-        duration: 1,
-        scrollTo: {
-          y: target,
-          offsetY: 80,
-        },
-        ease: 'power2.inOut',
-      })
+
+  const handleClick = (e: Event) => {
+    const link = e.currentTarget as HTMLAnchorElement
+    const href = link.getAttribute('href')
+    if (!href || href === '#') return
+
+    const target = document.querySelector(href)
+    if (!target) return
+
+    e.preventDefault()
+
+    const top =
+      target.getBoundingClientRect().top + window.scrollY - NAV_OFFSET
+
+    window.scrollTo({
+      top,
+      behavior: 'smooth',
     })
+  }
+
+  links.forEach((link) => {
+    link.addEventListener('click', handleClick)
   })
+
+  return () => {
+    links.forEach((link) => {
+      link.removeEventListener('click', handleClick)
+    })
+  }
 }
 
 // Stagger in list items

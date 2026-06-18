@@ -42,26 +42,25 @@
 }
 
 .dark {
-  /* Dark mode: Professional tech palette */
-  --background: #0f172a;
+  --background: #0b0e14;
   --foreground: #f1f5f9;
-  --card: #1e293b;
+  --card: #151922;
   --card-foreground: #f1f5f9;
-  --popover: #1e293b;
+  --popover: #151922;
   --popover-foreground: #f1f5f9;
   --primary: #f1f5f9;
-  --primary-foreground: #0f172a;
-  --secondary: #334155;
+  --primary-foreground: #0b0e14;
+  --secondary: #1e2433;
   --secondary-foreground: #f1f5f9;
-  --muted: #475569;
-  --muted-foreground: #cbd5e1;
-  --accent: #60a5fa;
-  --accent-foreground: #0f172a;
+  --muted: #2a3142;
+  --muted-foreground: #94a3b8;
+  --accent: #8b9cb8;
+  --accent-foreground: #0b0e14;
   --destructive: #f87171;
-  --destructive-foreground: #0f172a;
-  --border: #334155;
-  --input: #1e293b;
-  --ring: #60a5fa;
+  --destructive-foreground: #0b0e14;
+  --border: #1e2433;
+  --input: #151922;
+  --ring: #8b9cb8;
   --chart-1: #60a5fa;
   --chart-2: #22d3ee;
   --chart-3: #a78bfa;
@@ -143,5 +142,52 @@
   }
   body {
     @apply bg-background text-foreground;
+  }
+  section[id] {
+    scroll-margin-top: 4rem;
+  }
+}
+
+@layer utilities {
+  .portfolio-card {
+    @apply rounded-2xl border border-border/60 bg-card/80 backdrop-blur-sm;
+  }
+
+  .portfolio-card-hover {
+    @apply transition-all duration-300 hover:border-accent/40 hover:shadow-lg hover:shadow-accent/5 hover:-translate-y-1;
+  }
+
+  .filter-pill {
+    @apply inline-flex items-center gap-2 px-5 py-2.5 rounded-full text-sm font-medium border border-border/60 transition-all duration-300;
+  }
+
+  .filter-pill-active {
+    @apply bg-accent text-accent-foreground border-accent shadow-lg shadow-accent/25;
+    transform: scale(1.02);
+  }
+
+  .filter-pill-inactive {
+    @apply bg-card/60 text-muted-foreground border-border/60 hover:text-foreground hover:border-accent/40 hover:bg-card hover:scale-[1.02];
+  }
+
+  .section-divider {
+    @apply border-t border-border/40;
+  }
+
+  .hero-portrait-wrap {
+    @apply isolate shrink-0;
+  }
+
+  .hero-portrait-glow {
+    @apply pointer-events-none absolute bottom-[6%] left-1/2 h-[42%] w-[72%] -translate-x-1/2 rounded-full bg-accent/10 blur-3xl dark:bg-accent/16;
+  }
+
+  .hero-portrait {
+    @apply object-contain object-bottom scale-[1.12] sm:scale-[1.14] md:scale-[1.16] lg:scale-[1.18];
+    filter: drop-shadow(0 14px 28px rgb(15 23 42 / 0.14));
+  }
+
+  .dark .hero-portrait {
+    filter: drop-shadow(0 18px 36px rgb(0 0 0 / 0.42));
   }
 }

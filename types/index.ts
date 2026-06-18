@@ -7,11 +7,25 @@ export interface Project {
   id: string;
   title: LanguageText;
   description: LanguageText;
+  overview?: LanguageText;
+  challenges?: LanguageText;
+  role?: LanguageText;
   image: string;
   category: string;
   technologies: string[];
   link: string;
   github?: string;
+}
+
+export interface Experience {
+  id: string;
+  date: LanguageText;
+  badge: LanguageText;
+  title: LanguageText;
+  company: LanguageText;
+  description: LanguageText;
+  stack: string[];
+  type: "work" | "education";
 }
 
 export interface Service {
@@ -24,6 +38,7 @@ export interface Service {
 export interface ContactFormData {
   name: string;
   email: string;
+  subject: string;
   message: string;
 }
 
