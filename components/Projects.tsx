@@ -1,54 +1,98 @@
 'use client'
 
-import { useEffect, useRef, useState } from "react";
-import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { projects } from "@/data/projects";
-import type { Project } from "@/types";
-import { useLanguage } from "@/context/LanguageContext";
-import ProjectCard from "./ProjectCard";
+import { useEffect, useRef, useState } from 'react'
+import gsap from 'gsap'
+import { ScrollTrigger } from 'gsap/ScrollTrigger'
+import { Filter, Globe, Monitor, Smartphone } from 'lucide-react'
+import SectionHeader from './SectionHeader'
+import ProjectCard from './ProjectCard'
+import ProjectModal from './ProjectModal'
+import { projects } from '@/data/projects'
+import type { Project } from '@/types'
+import { useLanguage } from '@/context/LanguageContext'
+import { shouldAnimateOnScroll } from '@/utils/motion'
+import {
+  animateGridIn,
+  animateGridOut,
+  animatePillClick,
+} from '@/utils/filterAnimations'
 
-gsap.registerPlugin(ScrollTrigger);
+gsap.registerPlugin(ScrollTrigger)
+
+function filterByCategory(category: string): Project[] {
+  if (category === 'all') return projects
+  if (category === 'web') {
+    return projects.filter(function (p) {
+      return p.category === 'Web Development'
+    })
+  }
+  if (category === 'desktop') {
+    return projects.filter(function (p) {
+      return p.category === 'Desktop'
+    })
+  }
+  if (category === 'mobile') {
+    return projects.filter(function (p) {
+      return p.category === 'Mobile'
+    })
+  }
+  return projects
+}
 
 export default function Projects() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
+  var sectionRef = useRef<HTMLDivElement>(null)
+  var gridRef = useRef<HTMLDivElement>(null)
+  var isFirstRender = useRef(true)
+  var { t, language } = useLanguage()
 
-  const { t, language } = useLanguage();
-  const categories = [
-    t("projects.all"),
-    t("projects.web"),
-    t("projects.desktop"),
-    t("projects.mobile"),
-  ];
+  var categories = [
+    { key: 'all', label: t('projects.all'), icon: Filter },
+    { key: 'web', label: t('projects.web'), icon: Globe },
+    { key: 'desktop', label: t('projects.desktop'), icon: Monitor },
+    { key: 'mobile', label: t('projects.mobile'), icon: Smartphone },
+  ]
 
-  const [activeCategory, setActiveCategory] = useState(categories[0]);
-  const [filteredProjects, setFilteredProjects] = useState<Project[]>(projects);
+  var [activeCategory, setActiveCategory] = useState('all')
+  var [filteredProjects, setFilteredProjects] = useState<Project[]>(projects)
+  var [selectedProject, setSelectedProject] = useState<Project | null>(null)
+  var [modalOpen, setModalOpen] = useState(false)
+  var [isAnimating, setIsAnimating] = useState(false)
 
-  useEffect(() => {
-    if (activeCategory === t("projects.all")) {
-      setFilteredProjects(projects);
-    } else {
-      setFilteredProjects(
-        projects.filter((p) => {
-          if (activeCategory === t("projects.web"))
-            return p.category === "Web Development";
-          if (activeCategory === t("projects.desktop"))
-            return p.category === "Desktop";
-          if (activeCategory === t("projects.mobile"))
-            return p.category === "Mobile";
-          return true;
-        }),
-      );
-    }
-  }, [activeCategory, t]);
+  useEffect(
+    function () {
+      setFilteredProjects(filterByCategory(activeCategory))
+    },
+    [activeCategory],
+  )
 
-  useEffect(() => {
-    if (!sectionRef.current || !titleRef.current) return;
+  useEffect(
+    function () {
+      if (!gridRef.current) return
+
+      if (isFirstRender.current) {
+        isFirstRender.current = false
+        requestAnimationFrame(function () {
+          if (gridRef.current) {
+            animateGridIn(gridRef.current, '.project-card')
+          }
+        })
+        return
+      }
+
+      requestAnimationFrame(function () {
+        if (gridRef.current) {
+          animateGridIn(gridRef.current, '.project-card')
+        }
+      })
+    },
+    [filteredProjects],
+  )
+
+  useEffect(function () {
+    if (!sectionRef.current || !shouldAnimateOnScroll()) return
 
     gsap.fromTo(
-      titleRef.current,
+      sectionRef.current.querySelector('.projects-header'),
       { opacity: 0, y: 30 },
       {
         opacity: 1,
@@ -56,87 +100,105 @@ export default function Projects() {
         duration: 0.8,
         scrollTrigger: {
           trigger: sectionRef.current,
-          start: "top center",
-          toggleActions: "play none none none",
+          start: 'top 75%',
         },
       },
-    );
+    )
+  }, [])
 
-    const cards = gridRef.current?.querySelectorAll(".project-card");
-    if (cards) {
-      gsap.fromTo(
-        cards,
-        { opacity: 0, scale: 0.8, y: 20 },
-        {
-          opacity: 1,
-          scale: 1,
-          y: 0,
-          duration: 0.6,
-          stagger: 0.1,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top center",
-            toggleActions: "play none none none",
-          },
-        },
-      );
+  var handleCategoryChange = function (
+    key: string,
+    event: React.MouseEvent<HTMLButtonElement>,
+  ) {
+    if (key === activeCategory || isAnimating) return
+
+    animatePillClick(event.currentTarget)
+
+    if (!gridRef.current) {
+      setActiveCategory(key)
+      return
     }
-  }, [filteredProjects]);
+
+    setIsAnimating(true)
+    animateGridOut(gridRef.current, '.project-card', function () {
+      setActiveCategory(key)
+      setIsAnimating(false)
+    })
+  }
+
+  var handleProjectClick = function (project: Project) {
+    setSelectedProject(project)
+    setModalOpen(true)
+  }
 
   return (
     <section
       id="projects"
       ref={sectionRef}
-      className="relative py-20 px-4 sm:px-6 lg:px-8 bg-card/50"
+      className="relative py-16 sm:py-24 px-4 sm:px-6 lg:px-8 section-divider"
     >
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-12 text-center">
-          <h2
-            ref={titleRef}
-            className="text-4xl sm:text-5xl font-bold text-foreground mb-4 text-balance"
-          >
-            {t("projects.title").split(" ")[0]}{" "}
-            <span className="text-accent">
-              {t("projects.title").split(" ").slice(1).join(" ")}
-            </span>
-          </h2>
-          <div className="w-16 h-1 bg-accent rounded-full mx-auto" />
+      <div className="max-w-7xl mx-auto">
+        <div className="projects-header">
+          <SectionHeader
+            title={t('projects.title')}
+            subtitle={t('projects.subtitle')}
+          />
         </div>
 
-        {/* Category Filter */}
-        <div className="mb-12 flex flex-wrap gap-3 justify-center">
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setActiveCategory(category)}
-              className={`px-6 py-2 rounded-full font-medium transition-all duration-300 ${
-                activeCategory === category
-                  ? "bg-accent text-accent-foreground"
-                  : "bg-background border border-border text-foreground hover:border-accent"
-              }`}
-            >
-              {category}
-            </button>
-          ))}
+        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 sm:mb-12 px-1">
+          {categories.map(function (category) {
+            var Icon = category.icon
+            var isActive = activeCategory === category.key
+            return (
+              <button
+                key={category.key}
+                type="button"
+                disabled={isAnimating}
+                onClick={function (e) {
+                  handleCategoryChange(category.key, e)
+                }}
+                className={`filter-pill text-xs sm:text-sm px-3 sm:px-5 py-2 sm:py-2.5 ${
+                  isActive ? 'filter-pill-active' : 'filter-pill-inactive'
+                } ${isAnimating ? 'opacity-80' : ''}`}
+              >
+                <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                {category.label}
+              </button>
+            )
+          })}
         </div>
 
-        {/* Projects Grid */}
-        <div ref={gridRef} className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredProjects.map((project) => (
-            <ProjectCard
-              key={project.id}
-              project={project}
-              language={language}
-            />
-          ))}
+        <div
+          ref={gridRef}
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+        >
+          {filteredProjects.map(function (project) {
+            return (
+              <ProjectCard
+                key={`${activeCategory}-${project.id}`}
+                project={project}
+                language={language}
+                onClick={function () {
+                  handleProjectClick(project)
+                }}
+              />
+            )
+          })}
         </div>
 
         {filteredProjects.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-muted-foreground">{t("projects.no_projects")}</p>
+            <p className="text-muted-foreground">{t('projects.no_projects')}</p>
           </div>
         )}
       </div>
+
+      <ProjectModal
+        project={selectedProject}
+        open={modalOpen}
+        onOpenChange={setModalOpen}
+        language={language}
+      />
     </section>
   )
 }

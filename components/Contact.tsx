@@ -2,64 +2,77 @@
 
 import { useRef, useEffect } from "react";
 import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import SectionHeader from "./SectionHeader";
 import { useLanguage } from "@/context/LanguageContext";
 import ContactInfo from "./ContactInfo";
 import ContactForm from "./ContactForm";
+import { shouldAnimateOnScroll } from "@/utils/motion";
+
+gsap.registerPlugin(ScrollTrigger);
 
 export default function Contact() {
-  const sectionRef = useRef<HTMLDivElement>(null);
-  const titleRef = useRef<HTMLHeadingElement>(null);
-  const { t } = useLanguage();
+  var sectionRef = useRef<HTMLDivElement>(null);
+  var { t } = useLanguage();
 
-  useEffect(() => {
-    const ctx = gsap.context(() => {
+  useEffect(function () {
+    if (!shouldAnimateOnScroll()) return;
+
+    var ctx = gsap.context(function () {
       if (!sectionRef.current) return;
 
-      const elements = sectionRef.current.querySelectorAll(".fade-in-item");
-      elements.forEach((element, index) => {
+      var leftItems = sectionRef.current.querySelectorAll(".contact-card");
+      gsap.fromTo(
+        leftItems,
+        { opacity: 0, x: -30 },
+        {
+          opacity: 1,
+          x: 0,
+          duration: 0.6,
+          stagger: 0.1,
+          scrollTrigger: {
+            trigger: sectionRef.current,
+            start: "top 70%",
+          },
+        },
+      );
+
+      var form = sectionRef.current.querySelector(".fade-in-item");
+      if (form) {
         gsap.fromTo(
-          element,
-          { opacity: 0, y: 30 },
+          form,
+          { opacity: 0, x: 30 },
           {
             opacity: 1,
-            y: 0,
-            duration: 0.8,
-            delay: index * 0.15,
+            x: 0,
+            duration: 0.7,
             scrollTrigger: {
               trigger: sectionRef.current,
               start: "top 70%",
             },
           },
         );
-      });
+      }
     }, sectionRef);
 
-    return () => ctx.revert();
+    return function () {
+      ctx.revert();
+    };
   }, []);
-
-  // Séparer le titre pour avoir "Get In" en couleur normale et "Touch" en accent
-  const titleParts = t("contact.title").split(" ");
-  const firstWords = titleParts.slice(0, -1).join(" ");
-  const lastWord = titleParts[titleParts.length - 1];
 
   return (
     <section
       id="contact"
       ref={sectionRef}
-      className="relative py-20 px-4 sm:px-6 lg:px-8"
+      className="relative py-24 px-4 sm:px-6 lg:px-8 bg-card/30"
     >
-      <div className="max-w-6xl mx-auto">
-        <div className="mb-12 text-center">
-          <h2
-            ref={titleRef}
-            className="text-4xl sm:text-5xl font-bold text-foreground mb-4 text-balance"
-          >
-            {firstWords} <span className="text-accent">{lastWord}</span>
-          </h2>
-          <div className="w-16 h-1 bg-accent rounded-full mx-auto" />
-        </div>
+      <div className="max-w-7xl mx-auto">
+        <SectionHeader
+          title={t("contact.title")}
+          subtitle={t("contact.subtitle")}
+        />
 
-        <div className="grid md:grid-cols-2 gap-12">
+        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
           <ContactInfo />
           <ContactForm />
         </div>

@@ -1,28 +1,22 @@
 "use client";
 
-import { Mail, Phone, MapPin } from "lucide-react";
+import { Mail, Phone, MapPin, Github, Linkedin, Circle } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
+import { SOCIAL_LINKS } from "@/constants/social";
 
 interface ContactInfoProps {
   className?: string;
 }
 
-interface ContactItem {
-  icon: typeof Mail | typeof Phone | typeof MapPin;
-  labelKey: string;
-  value: string;
-  href: string;
-}
-
 export default function ContactInfo({ className = "" }: ContactInfoProps) {
-  const { t } = useLanguage();
+  var { t } = useLanguage();
 
-  const contactItems: ContactItem[] = [
+  var contactItems = [
     {
       icon: Mail,
       labelKey: "contact.email_label_info",
       value: "herihasinamichael@gmail.com",
-      href: "mailto:herihasinamichael@gmail.com",
+      href: SOCIAL_LINKS.email,
     },
     {
       icon: Phone,
@@ -34,40 +28,34 @@ export default function ContactInfo({ className = "" }: ContactInfoProps) {
       icon: MapPin,
       labelKey: "contact.location_label",
       value: "Antananarivo, Madagascar",
-      href: "#",
+      href: "#contact",
     },
   ];
 
-  const socialLinks = [
-    { name: "LinkedIn", initial: "L" },
-    { name: "GitHub", initial: "G" },
-    { name: "Twitter", initial: "T" },
+  var socialLinks = [
+    { name: "LinkedIn", href: SOCIAL_LINKS.linkedin, icon: Linkedin },
+    { name: "GitHub", href: SOCIAL_LINKS.github, icon: Github },
+    { name: "Email", href: SOCIAL_LINKS.email, icon: Mail },
   ];
 
   return (
-    <div className={`space-y-8 ${className}`}>
-      <div className="fade-in-item">
-        <p className="text-lg text-muted-foreground mb-8">
-          {t("contact.info_description")}
-        </p>
-      </div>
-
-      {contactItems.map((item, index) => {
-        const Icon = item.icon;
+    <div className={`space-y-4 ${className}`}>
+      {contactItems.map(function (item, index) {
+        var Icon = item.icon;
         return (
           <a
             key={index}
             href={item.href}
-            className="fade-in-item flex items-start gap-4 group cursor-pointer"
+            className="contact-card fade-in-item portfolio-card portfolio-card-hover flex items-start gap-4 p-5 group"
           >
-            <div className="p-3 bg-accent/10 text-accent rounded-lg group-hover:bg-accent group-hover:text-accent-foreground transition-colors">
-              <Icon className="w-6 h-6" />
+            <div className="p-3 rounded-xl bg-accent/10 text-accent group-hover:bg-accent group-hover:text-accent-foreground transition-colors shrink-0">
+              <Icon className="w-5 h-5" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide mb-1">
                 {t(item.labelKey)}
               </p>
-              <p className="text-lg font-semibold text-foreground group-hover:text-accent transition-colors">
+              <p className="text-base font-semibold text-foreground group-hover:text-accent transition-colors">
                 {item.value}
               </p>
             </div>
@@ -75,21 +63,36 @@ export default function ContactInfo({ className = "" }: ContactInfoProps) {
         );
       })}
 
-      <div className="fade-in-item pt-4">
-        <p className="text-sm text-muted-foreground mb-4">
-          {t("contact.follow_me")}
+      <div className="contact-card fade-in-item portfolio-card p-5">
+        <div className="flex items-center gap-2 mb-2">
+          <Circle className="w-2.5 h-2.5 fill-green-500 text-green-500" />
+          <p className="text-sm font-semibold text-foreground">
+            {t("contact.available")}
+          </p>
+        </div>
+        <p className="text-sm text-muted-foreground leading-relaxed">
+          {t("contact.available_desc")}
         </p>
-        <div className="flex gap-4">
-          {socialLinks.map((social) => (
-            <a
-              key={social.name}
-              href="#"
-              className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-background border border-border hover:bg-accent hover:text-accent-foreground hover:border-accent transition-all"
-              aria-label={social.name}
-            >
-              <span className="text-sm font-medium">{social.initial}</span>
-            </a>
-          ))}
+      </div>
+
+      <div className="fade-in-item pt-2">
+        <p className="text-sm text-muted-foreground mb-3">{t("contact.follow_me")}</p>
+        <div className="flex gap-3">
+          {socialLinks.map(function (social) {
+            var Icon = social.icon;
+            return (
+              <a
+                key={social.name}
+                href={social.href}
+                target={social.href.startsWith("mailto:") ? undefined : "_blank"}
+                rel={social.href.startsWith("mailto:") ? undefined : "noopener noreferrer"}
+                className="inline-flex items-center justify-center w-11 h-11 rounded-xl bg-card border border-border/60 hover:bg-accent hover:text-accent-foreground hover:border-accent transition-all"
+                aria-label={social.name}
+              >
+                <Icon className="w-4 h-4" />
+              </a>
+            );
+          })}
         </div>
       </div>
     </div>

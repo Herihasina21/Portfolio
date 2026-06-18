@@ -144,16 +144,16 @@ section {
 
 /* Navbar scrolled state */
 nav {
-  transition: all 0.3s ease;
+  transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
-/* Smooth color transitions for theme */
-* {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
-
-/* Disable animation transitions for theme */
-html.dark * {
+/* Theme color transitions — scoped, not global * */
+body,
+nav,
+button,
+a,
+input,
+textarea {
   transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
 
@@ -169,4 +169,23 @@ html.dark * {
 
 .animate-spin {
   animation: spin 1s linear infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .animate-float {
+    animation: none;
+  }
+
+  body {
+    animation: none;
+  }
 }
