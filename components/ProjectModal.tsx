@@ -3,16 +3,20 @@
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
 import Image from "next/image";
-import { ExternalLink, Github } from "lucide-react";
+import { ArrowUpRight } from "lucide-react";
 import {
   Dialog,
   DialogContent,
   DialogTitle,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
 import type { Language, Project } from "@/types";
 import { useLanguage } from "@/context/LanguageContext";
+import {
+  getProjectCategoryLabel,
+  hasLiveProjectLink,
+} from "@/data/projects";
 import { prefersReducedMotion } from "@/utils/motion";
+import { animateModalIn } from "@/utils/gsapAnimations";
 
 interface ProjectModalProps {
   project: Project | null;
@@ -35,20 +39,7 @@ export default function ProjectModal({
       if (!open || !contentRef.current || prefersReducedMotion()) return;
 
       var ctx = gsap.context(function () {
-        var items = contentRef.current?.querySelectorAll(".modal-animate");
-        if (!items) return;
-
-        gsap.fromTo(
-          items,
-          { opacity: 0, y: 20 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.5,
-            stagger: 0.08,
-            ease: "power2.out",
-          },
-        );
+        animateModalIn(contentRef.current as HTMLElement);
       }, contentRef);
 
       return function () {
@@ -60,124 +51,118 @@ export default function ProjectModal({
 
   if (!project) return null;
 
-  var overview = project.overview?.[language] ?? project.description[language];
-  var challenges =
+  var categoryLabel = getProjectCategoryLabel(project, language);
+  var showLiveLink = hasLiveProjectLink(project.link);
+  var problem =
+    project.problem?.[language] ??
     project.challenges?.[language] ??
     (language === "fr"
-      ? "Concevoir une solution performante, maintenable et adaptée aux besoins réels des utilisateurs."
-      : "Designing a performant, maintainable solution tailored to real user needs.");
-  var role =
-    project.role?.[language] ??
-    (language === "fr"
-      ? "Développeur Fullstack — conception, développement et déploiement."
-      : "Fullstack Developer — design, development, and deployment.");
+      ? "Répondre à un besoin concret avec une solution fiable et évolutive."
+      : "Address a concrete need with a reliable, scalable solution.");
+  var solution =
+    project.solution?.[language] ??
+    project.overview?.[language] ??
+    project.description[language];
+  var features =
+    project.features ??
+    project.technologies.map(function (tech) {
+      return { en: tech, fr: tech };
+    });
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="max-w-4xl max-h-[90vh] overflow-y-auto bg-card border-border/60 p-0 gap-0 sm:max-w-4xl"
+        className="max-w-3xl max-h-[92vh] gap-0 overflow-y-auto border-border/40 bg-card p-0 sm:max-w-3xl dark:border-white/10 dark:bg-[#11151c]"
         showCloseButton
       >
-        <div ref={contentRef} className="p-6 sm:p-8">
-          <DialogTitle className="modal-animate text-2xl font-bold mb-4 pr-8">
-            {project.title[language]}
-          </DialogTitle>
+        <div ref={contentRef}>
+          {project.image && (
+            <div className="modal-hero relative aspect-[16/10] w-full overflow-hidden bg-muted/20">
+              <Image
+                src={project.image}
+                alt={project.title[language]}
+                fill
+                className="object-cover object-top"
+                sizes="(max-width: 768px) 100vw, 768px"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-card via-transparent to-transparent dark:from-[#11151c]" />
+            </div>
+          )}
 
-          <div className="modal-animate flex flex-wrap gap-2 mb-6">
-            {project.technologies.map(function (tech) {
-              return (
-                <span
-                  key={tech}
-                  className="text-xs px-3 py-1 rounded-full bg-accent/15 text-accent font-medium"
-                >
-                  {tech}
-                </span>
-              );
-            })}
-          </div>
+          <div className="px-6 pb-8 pt-6 sm:px-9 sm:pb-10 sm:pt-8">
+            <p className="modal-animate mb-3 text-[11px] font-medium uppercase tracking-[0.14em] text-muted-foreground">
+              {categoryLabel}
+            </p>
 
-          <div className="modal-animate grid lg:grid-cols-2 gap-8">
-            <div className="space-y-4">
-              {project.image && (
-                <div className="relative rounded-xl overflow-hidden border border-border/60 aspect-video">
-                  <Image
-                    src={project.image}
-                    alt={project.title[language]}
-                    fill
-                    className="object-cover"
-                  />
-                </div>
-              )}
+            <DialogTitle className="modal-animate mb-4 pr-10 text-2xl font-bold leading-tight text-foreground sm:text-[1.75rem]">
+              {project.title[language]}
+            </DialogTitle>
 
-              <div className="flex flex-wrap gap-3">
+            <p className="modal-animate mb-8 max-w-2xl text-sm leading-relaxed text-muted-foreground sm:text-[15px]">
+              {project.description[language]}
+            </p>
+
+            <div className="modal-animate mb-8 grid gap-8 sm:grid-cols-2">
+              <div>
+                <h4 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                  {t("projects.problem")}
+                </h4>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {problem}
+                </p>
+              </div>
+              <div>
+                <h4 className="mb-3 text-[11px] font-semibold uppercase tracking-[0.12em] text-muted-foreground">
+                  {t("projects.solution")}
+                </h4>
+                <p className="text-sm leading-relaxed text-muted-foreground">
+                  {solution}
+                </p>
+              </div>
+            </div>
+
+            <ul className="modal-animate mb-10 space-y-2.5">
+              {features.map(function (feature, index) {
+                return (
+                  <li
+                    key={index}
+                    className="flex items-start gap-3 text-sm text-muted-foreground"
+                  >
+                    <span
+                      className="mt-[9px] h-1 w-1 shrink-0 rounded-full bg-foreground/50"
+                      aria-hidden="true"
+                    />
+                    <span>{feature[language]}</span>
+                  </li>
+                );
+              })}
+            </ul>
+
+            <div className="modal-animate flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-wrap gap-2">
+                {project.technologies.map(function (tech) {
+                  return (
+                    <span
+                      key={tech}
+                      className="rounded-full border border-border/60 px-3.5 py-1.5 text-xs text-muted-foreground dark:border-white/12 dark:text-foreground/75"
+                    >
+                      {tech}
+                    </span>
+                  );
+                })}
+              </div>
+
+              {showLiveLink && (
                 <a
                   href={project.link}
                   target="_blank"
                   rel="noopener noreferrer"
+                  className="inline-flex shrink-0 items-center justify-center gap-2 rounded-full bg-foreground px-6 py-2.5 text-sm font-medium text-background transition-opacity hover:opacity-90"
                 >
-                  <Button className="gap-2 bg-accent hover:bg-accent/90 text-accent-foreground">
-                    <ExternalLink className="w-4 h-4" />
-                    {t("projects.demo")}
-                  </Button>
+                  {t("projects.view")}
+                  <ArrowUpRight className="h-4 w-4" />
                 </a>
-                {project.github && (
-                  <a
-                    href={project.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                  >
-                    <Button variant="outline" className="gap-2">
-                      <Github className="w-4 h-4" />
-                      {t("projects.code")}
-                    </Button>
-                  </a>
-                )}
-              </div>
-
-              <div>
-                <h4 className="text-sm font-semibold text-foreground mb-2">
-                  {t("projects.stack")}
-                </h4>
-                <div className="flex flex-wrap gap-2">
-                  {project.technologies.map(function (tech) {
-                    return (
-                      <span
-                        key={tech}
-                        className="text-xs px-2.5 py-1 rounded-md bg-background border border-border/60 text-muted-foreground"
-                      >
-                        {tech}
-                      </span>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-
-            <div className="space-y-5">
-              <div className="modal-animate">
-                <h4 className="text-sm font-semibold text-foreground mb-2">
-                  {t("projects.overview")}
-                </h4>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {overview}
-                </p>
-              </div>
-              <div className="modal-animate">
-                <h4 className="text-sm font-semibold text-foreground mb-2">
-                  {t("projects.challenges")}
-                </h4>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {challenges}
-                </p>
-              </div>
-              <div className="modal-animate">
-                <h4 className="text-sm font-semibold text-foreground mb-2">
-                  {t("projects.role")}
-                </h4>
-                <p className="text-sm text-muted-foreground leading-relaxed">
-                  {role}
-                </p>
-              </div>
+              )}
             </div>
           </div>
         </div>

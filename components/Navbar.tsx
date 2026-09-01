@@ -68,6 +68,7 @@ export default function Navbar() {
                       ? 'text-foreground bg-card/80'
                       : 'text-muted-foreground hover:text-foreground hover:bg-card/40'
                   }`}
+                  aria-current={isActive ? 'page' : undefined}
                 >
                   {link.label}
                   {isActive && (
@@ -85,31 +86,34 @@ export default function Navbar() {
               onClick={function () {
                 setTheme(isDark ? 'light' : 'dark')
               }}
-              className="hover:bg-card/80 rounded-full h-8 w-8 sm:h-9 sm:w-9"
+              className="rounded-full h-8 w-8 sm:h-9 sm:w-9 text-foreground hover:bg-foreground/10 hover:text-foreground dark:hover:bg-foreground/15 dark:hover:text-foreground"
               aria-label="Toggle theme"
               suppressHydrationWarning
             >
               <Sun
-                className={`w-4 h-4 ${isDark ? 'block' : 'hidden'}`}
+                className={`h-4 w-4 text-current ${isDark ? 'block' : 'hidden'}`}
                 suppressHydrationWarning
               />
               <Moon
-                className={`w-4 h-4 ${isDark ? 'hidden' : 'block'}`}
+                className={`h-4 w-4 text-current ${isDark ? 'hidden' : 'block'}`}
                 suppressHydrationWarning
               />
             </Button>
 
             <LanguageSelector className="hidden sm:block" />
 
-            <a href="/cv.pdf" download className="hidden md:block">
+            <a
+              href="/CV-Herihasina.pdf"
+              download="CV-Herihasina.pdf"
+              className="hidden md:block"
+            >
               <Button
                 variant="outline"
                 size="sm"
-                className="rounded-full gap-2 border-border/60 hover:border-accent/40 text-xs sm:text-sm h-8 sm:h-9"
+                className="rounded-full gap-2 border-border/60 hover:border-accent/50 hover:bg-accent/10 hover:text-foreground text-xs sm:text-sm h-8 sm:h-9"
               >
-                <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                <span className="hidden lg:inline">{t('nav.download_cv')}</span>
-                <span className="lg:hidden">CV</span>
+                <Download className="w-3.5 h-3.5 sm:w-4 sm:h-4 shrink-0" />
+                <span>{t('nav.download_cv')}</span>
               </Button>
             </a>
 
@@ -138,9 +142,10 @@ export default function Navbar() {
                     href={link.href}
                     className={`block px-3 py-2.5 rounded-xl transition-colors text-sm font-medium ${
                       isActive
-                        ? 'bg-accent text-accent-foreground'
-                        : 'text-muted-foreground hover:bg-card/80 hover:text-foreground'
+                        ? 'bg-card text-foreground border border-accent/35 shadow-sm'
+                        : 'text-muted-foreground hover:bg-card/70 hover:text-foreground'
                     }`}
+                    aria-current={isActive ? 'page' : undefined}
                     onClick={function () {
                       setIsOpen(false)
                     }}
@@ -154,7 +159,11 @@ export default function Navbar() {
                 <LanguageSelector />
               </div>
 
-              <a href="/cv.pdf" download className="block px-3 py-2.5 mt-1 md:hidden">
+              <a
+                href="/CV-Herihasina.pdf"
+                download="CV-Herihasina.pdf"
+                className="block px-3 py-2.5 mt-1 md:hidden"
+              >
                 <Button variant="outline" className="w-full rounded-xl gap-2">
                   <Download className="w-4 h-4" />
                   {t('nav.download_cv')}

@@ -1,11 +1,16 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
-import { ArrowRight, ChevronDown, Github, Linkedin, Mail } from 'lucide-react'
+import { ArrowRight, Github, Linkedin, Mail } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { useLanguage } from '@/context/LanguageContext'
 import { SOCIAL_LINKS } from '@/constants/social'
-import { prefersReducedMotion } from '@/utils/motion'
+import { MOTION_EASE, prefersReducedMotion } from '@/utils/motion'
+import {
+  animateTextStagger,
+  startDriftLoop,
+  startFloatLoop,
+} from '@/utils/gsapAnimations'
 import gsap from 'gsap'
 import Image from 'next/image'
 
@@ -18,10 +23,11 @@ export default function Hero() {
   var socialRef = useRef<HTMLDivElement>(null)
   var imageWrapRef = useRef<HTMLDivElement>(null)
   var portraitRef = useRef<HTMLDivElement>(null)
+  var ringOuterRef = useRef<HTMLDivElement>(null)
+  var ringInnerRef = useRef<HTMLDivElement>(null)
   var glowRef = useRef<HTMLDivElement>(null)
   var bgGlowLeftRef = useRef<HTMLDivElement>(null)
   var bgGlowRightRef = useRef<HTMLDivElement>(null)
-  var scrollIndicatorRef = useRef<HTMLAnchorElement>(null)
 
   var { t } = useLanguage()
 
@@ -40,12 +46,13 @@ export default function Hero() {
             subtitleRef.current,
             imageWrapRef.current,
             portraitRef.current,
+            ringOuterRef.current,
+            ringInnerRef.current,
             glowRef.current,
             bgGlowLeftRef.current,
             bgGlowRightRef.current,
-            scrollIndicatorRef.current,
           ],
-          { opacity: 1, x: 0, y: 0, scale: 1 },
+          { opacity: 1, x: 0, y: 0, scale: 1, rotate: 0 },
         )
         if (nameRef.current) {
           gsap.set(nameRef.current.querySelectorAll('.hero-char'), {
@@ -65,13 +72,13 @@ export default function Hero() {
         return
       }
 
-      var tl = gsap.timeline({ defaults: { ease: 'power3.out' } })
+      var tl = gsap.timeline({ defaults: { ease: MOTION_EASE } })
 
       if (bgGlowLeftRef.current && bgGlowRightRef.current) {
         tl.fromTo(
           [bgGlowLeftRef.current, bgGlowRightRef.current],
-          { opacity: 0, scale: 0.75 },
-          { opacity: 1, scale: 1, duration: 1.4, stagger: 0.15 },
+          { opacity: 0, scale: 0.7 },
+          { opacity: 1, scale: 1, duration: 1.5, stagger: 0.18 },
           0,
         )
       }
@@ -82,56 +89,79 @@ export default function Hero() {
         tl.fromTo(
           imageWrapRef.current,
           isDesktop
-            ? { opacity: 0, scale: 0.88, x: 56, y: 0 }
-            : { opacity: 0, scale: 0.94, x: 0, y: -32 },
-          { opacity: 1, scale: 1, x: 0, y: 0, duration: 1.1 },
-          0.15,
+            ? { opacity: 0, scale: 0.86, x: 64 }
+            : { opacity: 0, scale: 0.92, y: -36 },
+          { opacity: 1, scale: 1, x: 0, y: 0, duration: 1.15 },
+          0.12,
+        )
+      }
+
+      if (ringOuterRef.current) {
+        tl.fromTo(
+          ringOuterRef.current,
+          { opacity: 0, scale: 0.82, rotate: -60 },
+          { opacity: 1, scale: 1, rotate: 0, duration: 1.1, ease: 'power2.out' },
+          0.28,
+        )
+      }
+
+      if (ringInnerRef.current) {
+        tl.fromTo(
+          ringInnerRef.current,
+          { opacity: 0, scale: 0.78, rotate: 50 },
+          { opacity: 1, scale: 1, rotate: 0, duration: 1.2, ease: 'power2.out' },
+          0.34,
         )
       }
 
       if (portraitRef.current) {
         tl.fromTo(
           portraitRef.current,
-          { opacity: 0, scale: 0.92, rotate: -2 },
-          { opacity: 1, scale: 1, rotate: 0, duration: 1, ease: 'back.out(1.4)' },
-          0.35,
+          { opacity: 0, scale: 0.82 },
+          {
+            opacity: 1,
+            scale: 1,
+            duration: 1.05,
+            ease: 'back.out(1.5)',
+          },
+          0.4,
         )
       }
 
       if (glowRef.current) {
         tl.fromTo(
           glowRef.current,
-          { opacity: 0, scale: 0.6 },
-          { opacity: 1, scale: 1, duration: 0.9 },
-          0.45,
+          { opacity: 0, scale: 0.55 },
+          { opacity: 1, scale: 1, duration: 0.95 },
+          0.5,
         )
       }
 
       if (badgeRef.current) {
         tl.fromTo(
           badgeRef.current,
-          { opacity: 0, y: 18, scale: 0.96 },
-          { opacity: 1, y: 0, scale: 1, duration: 0.65 },
-          0.25,
+          { opacity: 0, y: 22, scale: 0.94 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.7 },
+          0.22,
         )
       }
 
       if (nameRef.current) {
-        var chars = nameRef.current.querySelectorAll('.hero-char')
-        tl.fromTo(
-          chars,
-          { opacity: 0, y: 22 },
-          { opacity: 1, y: 0, duration: 0.75, stagger: 0.035 },
-          0.35,
-        )
+        animateTextStagger(nameRef.current, {
+          charSelector: '.hero-char',
+          timeline: tl,
+          position: 0.34,
+          y: 28,
+          stagger: 0.032,
+        })
       }
 
       if (subtitleRef.current) {
         tl.fromTo(
           subtitleRef.current,
-          { opacity: 0, y: 20 },
-          { opacity: 1, y: 0, duration: 0.75 },
-          0.7,
+          { opacity: 0, y: 24 },
+          { opacity: 1, y: 0, duration: 0.8 },
+          0.72,
         )
       }
 
@@ -139,9 +169,9 @@ export default function Hero() {
         var buttons = buttonsRef.current.querySelectorAll('button, a')
         tl.fromTo(
           buttons,
-          { opacity: 0, y: 24 },
-          { opacity: 1, y: 0, duration: 0.55, stagger: 0.12 },
-          0.85,
+          { opacity: 0, y: 28 },
+          { opacity: 1, y: 0, duration: 0.6, stagger: 0.12 },
+          0.88,
         )
       }
 
@@ -149,77 +179,31 @@ export default function Hero() {
         var icons = socialRef.current.querySelectorAll('a')
         tl.fromTo(
           icons,
-          { opacity: 0, y: 12, scale: 0.9 },
-          { opacity: 1, y: 0, scale: 1, duration: 0.45, stagger: 0.08 },
-          1,
+          { opacity: 0, y: 14, scale: 0.88 },
+          { opacity: 1, y: 0, scale: 1, duration: 0.5, stagger: 0.09 },
+          1.02,
         )
       }
 
-      if (scrollIndicatorRef.current) {
-        tl.fromTo(
-          scrollIndicatorRef.current,
-          { opacity: 0, y: -8 },
-          { opacity: 1, y: 0, duration: 0.5 },
-          1.15,
-        )
-      }
-
-      if (portraitRef.current) {
-        gsap.to(portraitRef.current, {
-          y: -10,
-          duration: 3.2,
-          ease: 'sine.inOut',
-          yoyo: true,
-          repeat: -1,
-          delay: 1.4,
-        })
-      }
-
-      if (glowRef.current) {
-        gsap.to(glowRef.current, {
-          scale: 1.18,
-          opacity: 0.75,
-          duration: 2.8,
-          ease: 'sine.inOut',
-          yoyo: true,
-          repeat: -1,
-          delay: 1.2,
-        })
-      }
-
-      if (bgGlowLeftRef.current) {
-        gsap.to(bgGlowLeftRef.current, {
-          x: 18,
-          y: -12,
-          duration: 7,
-          ease: 'sine.inOut',
-          yoyo: true,
-          repeat: -1,
-        })
-      }
-
-      if (bgGlowRightRef.current) {
-        gsap.to(bgGlowRightRef.current, {
-          x: -14,
-          y: 16,
-          duration: 8.5,
-          ease: 'sine.inOut',
-          yoyo: true,
-          repeat: -1,
-          delay: 0.5,
-        })
-      }
-
-      if (scrollIndicatorRef.current) {
-        gsap.to(scrollIndicatorRef.current, {
-          y: 8,
-          duration: 1.4,
-          ease: 'sine.inOut',
-          yoyo: true,
-          repeat: -1,
-          delay: 1.6,
-        })
-      }
+      startFloatLoop(imageWrapRef.current, { y: -10, duration: 3.6, delay: 1.5 })
+      startFloatLoop(glowRef.current, {
+        y: 0,
+        scale: 1.15,
+        opacity: 0.7,
+        duration: 3.2,
+        delay: 1.3,
+      })
+      startDriftLoop(bgGlowLeftRef.current, {
+        x: 20,
+        y: -14,
+        duration: 7.2,
+      })
+      startDriftLoop(bgGlowRightRef.current, {
+        x: -16,
+        y: 18,
+        duration: 8.8,
+        delay: 0.6,
+      })
     }, sectionRef)
 
     return function () {
@@ -241,7 +225,7 @@ export default function Hero() {
     <section
       ref={sectionRef}
       id="home"
-      className="relative flex min-h-[calc(100vh-4rem)] w-full items-center overflow-hidden px-4 pb-14 pt-24 sm:px-6 sm:pb-16 sm:pt-28 lg:px-8"
+      className="relative flex min-h-[calc(100vh-4rem)] w-full items-center overflow-hidden px-4 pb-14 pt-24 sm:px-6 sm:pb-16 sm:pt-28 lg:px-8 section-bg-patch-alt"
     >
       <div className="absolute inset-0 -z-20 bg-background" />
       <div
@@ -295,7 +279,7 @@ export default function Hero() {
               asChild
               size="lg"
               variant="outline"
-              className="rounded-full border-border/60 px-8 py-3 font-semibold transition-all duration-300 hover:border-accent hover:text-accent"
+              className="rounded-full border-border/60 bg-card/50 px-8 py-3 font-semibold text-foreground shadow-none transition-all duration-300 hover:border-foreground/25 hover:bg-card hover:text-foreground dark:bg-card/30 dark:hover:bg-card/60"
             >
               <a href="#projects" className="flex items-center gap-2">
                 {t('hero.cta_primary')}
@@ -338,14 +322,25 @@ export default function Hero() {
 
         <div
           ref={imageWrapRef}
-          className="order-1 flex justify-center md:order-2 md:justify-end md:self-center"
+          className="order-1 flex justify-center will-change-transform md:order-2 md:justify-end md:self-center"
         >
           <div className="hero-portrait-wrap relative aspect-square size-[min(72vw,260px)] sm:size-[min(68vw,300px)] md:size-[min(calc(100vh-9rem),420px)] lg:size-[min(calc(100vh-8rem),480px)] xl:size-[min(520px,calc(100vh-7.5rem))]">
             <div ref={glowRef} className="hero-portrait-glow" aria-hidden="true" />
 
-            <div ref={portraitRef} className="relative h-full w-full will-change-transform">
+            <div
+              ref={ringOuterRef}
+              className="hero-orbit hero-orbit--outer"
+              aria-hidden="true"
+            />
+            <div
+              ref={ringInnerRef}
+              className="hero-orbit hero-orbit--inner"
+              aria-hidden="true"
+            />
+
+            <div ref={portraitRef} className="hero-blob-frame">
               <Image
-                src="/assets/herihasina.png"
+                src="/assets/herihasina.jpg"
                 alt="Herihasina Michael Rakotoarivony"
                 fill
                 priority

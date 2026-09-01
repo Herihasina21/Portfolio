@@ -1,132 +1,99 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
-import { Filter, Globe, Monitor, Smartphone } from 'lucide-react'
+import { ChevronLeft, ChevronRight } from 'lucide-react'
 import SectionHeader from './SectionHeader'
 import ProjectCard from './ProjectCard'
 import ProjectModal from './ProjectModal'
 import { projects } from '@/data/projects'
 import type { Project } from '@/types'
 import { useLanguage } from '@/context/LanguageContext'
-import { shouldAnimateOnScroll } from '@/utils/motion'
-import {
-  animateGridIn,
-  animateGridOut,
-  animatePillClick,
-} from '@/utils/filterAnimations'
+import { shouldAnimateOnScroll, MOTION_EASE_IN_OUT } from '@/utils/motion'
+import { revealSectionHeader } from '@/utils/gsapAnimations'
 
-gsap.registerPlugin(ScrollTrigger)
-
-function filterByCategory(category: string): Project[] {
-  if (category === 'all') return projects
-  if (category === 'web') {
-    return projects.filter(function (p) {
-      return p.category === 'Web Development'
-    })
-  }
-  if (category === 'desktop') {
-    return projects.filter(function (p) {
-      return p.category === 'Desktop'
-    })
-  }
-  if (category === 'mobile') {
-    return projects.filter(function (p) {
-      return p.category === 'Mobile'
-    })
-  }
-  return projects
-}
+var INITIAL_PROJECT_INDEX = Math.floor(projects.length / 2)
+var CAROUSEL_DURATION = 0.85
 
 export default function Projects() {
   var sectionRef = useRef<HTMLDivElement>(null)
-  var gridRef = useRef<HTMLDivElement>(null)
-  var isFirstRender = useRef(true)
+  var trackRef = useRef<HTMLDivElement>(null)
+  var viewportRef = useRef<HTMLDivElement>(null)
+  var slideRefs = useRef<Array<HTMLDivElement | null>>([])
+  var hasPositionedRef = useRef(false)
   var { t, language } = useLanguage()
 
-  var categories = [
-    { key: 'all', label: t('projects.all'), icon: Filter },
-    { key: 'web', label: t('projects.web'), icon: Globe },
-    { key: 'desktop', label: t('projects.desktop'), icon: Monitor },
-    { key: 'mobile', label: t('projects.mobile'), icon: Smartphone },
-  ]
-
-  var [activeCategory, setActiveCategory] = useState('all')
-  var [filteredProjects, setFilteredProjects] = useState<Project[]>(projects)
+  var [activeIndex, setActiveIndex] = useState(INITIAL_PROJECT_INDEX)
   var [selectedProject, setSelectedProject] = useState<Project | null>(null)
   var [modalOpen, setModalOpen] = useState(false)
-  var [isAnimating, setIsAnimating] = useState(false)
 
-  useEffect(
+  var centerActiveSlide = useCallback(function (animate: boolean) {
+    var track = trackRef.current
+    var viewport = viewportRef.current
+    var slide = slideRefs.current[activeIndex]
+    if (!track || !viewport || !slide) return
+
+    var offset =
+      slide.offsetLeft - viewport.clientWidth / 2 + slide.clientWidth / 2
+
+    gsap.killTweensOf(track)
+
+    if (animate && hasPositionedRef.current) {
+      gsap.to(track, {
+        x: -offset,
+        duration: CAROUSEL_DURATION,
+        ease: MOTION_EASE_IN_OUT,
+        overwrite: true,
+      })
+    } else {
+      gsap.set(track, { x: -offset })
+      hasPositionedRef.current = true
+    }
+  }, [activeIndex])
+
+  useLayoutEffect(
     function () {
-      setFilteredProjects(filterByCategory(activeCategory))
-    },
-    [activeCategory],
-  )
-
-  useEffect(
-    function () {
-      if (!gridRef.current) return
-
-      if (isFirstRender.current) {
-        isFirstRender.current = false
-        requestAnimationFrame(function () {
-          if (gridRef.current) {
-            animateGridIn(gridRef.current, '.project-card')
-          }
-        })
-        return
-      }
+      slideRefs.current = slideRefs.current.slice(0, projects.length)
 
       requestAnimationFrame(function () {
-        if (gridRef.current) {
-          animateGridIn(gridRef.current, '.project-card')
-        }
+        centerActiveSlide(hasPositionedRef.current)
       })
     },
-    [filteredProjects],
+    [activeIndex, centerActiveSlide],
   )
+
+  useEffect(function () {
+    function handleResize() {
+      centerActiveSlide(false)
+    }
+
+    window.addEventListener('resize', handleResize)
+    return function () {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [centerActiveSlide])
 
   useEffect(function () {
     if (!sectionRef.current || !shouldAnimateOnScroll()) return
 
-    gsap.fromTo(
-      sectionRef.current.querySelector('.projects-header'),
-      { opacity: 0, y: 30 },
-      {
-        opacity: 1,
-        y: 0,
-        duration: 0.8,
-        scrollTrigger: {
-          trigger: sectionRef.current,
-          start: 'top 75%',
-        },
-      },
-    )
+    revealSectionHeader(sectionRef.current, '.projects-header')
   }, [])
 
-  var handleCategoryChange = function (
-    key: string,
-    event: React.MouseEvent<HTMLButtonElement>,
-  ) {
-    if (key === activeCategory || isAnimating) return
-
-    animatePillClick(event.currentTarget)
-
-    if (!gridRef.current) {
-      setActiveCategory(key)
-      return
-    }
-
-    setIsAnimating(true)
-    animateGridOut(gridRef.current, '.project-card', function () {
-      setActiveCategory(key)
-      setIsAnimating(false)
-    })
+  var goToSlide = function (index: number) {
+    if (index < 0 || index >= projects.length) return
+    setActiveIndex(index)
   }
 
-  var handleProjectClick = function (project: Project) {
+  var handlePrev = function () {
+    goToSlide(activeIndex - 1)
+  }
+
+  var handleNext = function () {
+    goToSlide(activeIndex + 1)
+  }
+
+  var handleProjectClick = function (project: Project, index: number) {
+    setActiveIndex(index)
     setSelectedProject(project)
     setModalOpen(true)
   }
@@ -135,9 +102,9 @@ export default function Projects() {
     <section
       id="projects"
       ref={sectionRef}
-      className="relative py-16 sm:py-24 px-4 sm:px-6 lg:px-8 section-divider"
+      className="relative section-divider px-4 py-16 sm:px-6 sm:py-24 lg:px-8 section-bg-band"
     >
-      <div className="max-w-7xl mx-auto">
+      <div className="mx-auto max-w-7xl">
         <div className="projects-header">
           <SectionHeader
             title={t('projects.title')}
@@ -145,52 +112,78 @@ export default function Projects() {
           />
         </div>
 
-        <div className="flex flex-wrap justify-center gap-2 sm:gap-3 mb-8 sm:mb-12 px-1">
-          {categories.map(function (category) {
-            var Icon = category.icon
-            var isActive = activeCategory === category.key
-            return (
-              <button
-                key={category.key}
-                type="button"
-                disabled={isAnimating}
-                onClick={function (e) {
-                  handleCategoryChange(category.key, e)
-                }}
-                className={`filter-pill text-xs sm:text-sm px-3 sm:px-5 py-2 sm:py-2.5 ${
-                  isActive ? 'filter-pill-active' : 'filter-pill-inactive'
-                } ${isAnimating ? 'opacity-80' : ''}`}
-              >
-                <Icon className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
-                {category.label}
-              </button>
-            )
-          })}
-        </div>
-
         <div
-          ref={gridRef}
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6"
+          ref={viewportRef}
+          className="projects-carousel-viewport relative overflow-hidden"
         >
-          {filteredProjects.map(function (project) {
-            return (
-              <ProjectCard
-                key={`${activeCategory}-${project.id}`}
-                project={project}
-                language={language}
-                onClick={function () {
-                  handleProjectClick(project)
-                }}
-              />
-            )
-          })}
+          <div
+            ref={trackRef}
+            className="flex items-center gap-5 sm:gap-7 will-change-transform"
+          >
+            {projects.map(function (project, index) {
+              return (
+                <div
+                  key={project.id}
+                  ref={function (el) {
+                    slideRefs.current[index] = el
+                  }}
+                  className="w-[min(88vw,420px)] shrink-0 sm:w-[420px]"
+                >
+                  <ProjectCard
+                    project={project}
+                    language={language}
+                    isActive={index === activeIndex}
+                    onClick={function () {
+                      handleProjectClick(project, index)
+                    }}
+                  />
+                </div>
+              )
+            })}
+          </div>
         </div>
 
-        {filteredProjects.length === 0 && (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground">{t('projects.no_projects')}</p>
+        <div className="mt-8 flex items-center justify-center gap-4 sm:mt-10">
+          <button
+            type="button"
+            onClick={handlePrev}
+            disabled={activeIndex === 0}
+            aria-label={t('projects.prev')}
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-border/50 bg-card/60 text-foreground backdrop-blur-sm transition-all hover:border-foreground/30 hover:bg-card disabled:cursor-not-allowed disabled:opacity-25"
+          >
+            <ChevronLeft className="h-5 w-5" />
+          </button>
+
+          <div className="flex items-center gap-2">
+            {projects.map(function (_, index) {
+              return (
+                <button
+                  key={index}
+                  type="button"
+                  onClick={function () {
+                    goToSlide(index)
+                  }}
+                  aria-label={`${t('projects.go_to')} ${index + 1}`}
+                  className={`h-2 rounded-full transition-all duration-300 ${
+                    index === activeIndex
+                      ? 'w-7 bg-foreground'
+                      : 'w-2 bg-muted-foreground/35 hover:bg-muted-foreground/60'
+                  }`}
+                />
+              )
+            })}
           </div>
-        )}
+
+          <button
+            type="button"
+            onClick={handleNext}
+            disabled={activeIndex === projects.length - 1}
+            aria-label={t('projects.next')}
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-border/50 bg-card/60 text-foreground backdrop-blur-sm transition-all hover:border-foreground/30 hover:bg-card disabled:cursor-not-allowed disabled:opacity-25"
+          >
+            <ChevronRight className="h-5 w-5" />
+          </button>
+        </div>
       </div>
 
       <ProjectModal

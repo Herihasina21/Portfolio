@@ -13,3 +13,8 @@ export function shouldAnimateOnScroll() {
 
   return !prefersReducedMotion() && window.innerWidth >= 768;
 }
+
+export var MOTION_EASE = "power3.out";
+export var MOTION_EASE_IN_OUT = "power3.inOut";
+export var MOTION_DURATION = 0.75;
+export var MOTION_STAGGER = 0.08;

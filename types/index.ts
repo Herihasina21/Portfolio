@@ -3,6 +3,8 @@ export type LanguageText = {
   fr: string;
 };
 
+export type ProjectScope = "academic" | "professional" | "personal";
+
 export interface Project {
   id: string;
   title: LanguageText;
@@ -10,6 +12,11 @@ export interface Project {
   overview?: LanguageText;
   challenges?: LanguageText;
   role?: LanguageText;
+  problem?: LanguageText;
+  solution?: LanguageText;
+  features?: LanguageText[];
+  categoryLabel?: LanguageText;
+  projectScope: ProjectScope;
   image: string;
   category: string;
   technologies: string[];

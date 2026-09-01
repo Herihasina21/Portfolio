@@ -1,46 +1,88 @@
 import type { Metadata, Viewport } from 'next'
-import { Geist, Geist_Mono } from 'next/font/google'
+import { DM_Sans, Geist, Geist_Mono, Plus_Jakarta_Sans } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
+import { getSiteUrl } from '@/lib/site'
+import JsonLd from '@/components/JsonLd'
 import { Providers } from './providers'
 import './globals.css'
 
-const _geist = Geist({ subsets: ["latin"] });
-const _geistMono = Geist_Mono({ subsets: ["latin"] });
+const geistSans = Geist({
+  subsets: ['latin'],
+  variable: '--font-geist-sans',
+})
+
+const geistMono = Geist_Mono({
+  subsets: ['latin'],
+  variable: '--font-geist-mono',
+})
+
+const plusJakarta = Plus_Jakarta_Sans({
+  subsets: ['latin'],
+  variable: '--font-plus-jakarta',
+  weight: ['500', '600', '700', '800'],
+})
+
+const dmSans = DM_Sans({
+  subsets: ['latin'],
+  variable: '--font-dm-sans',
+  weight: ['400', '500', '600'],
+})
+
+const siteUrl = getSiteUrl()
+
+const ogImage = {
+  url: '/assets/herihasina.jpg',
+  width: 1200,
+  height: 1200,
+  alt: 'Herihasina Michael Rakotoarivony — Développeur Fullstack',
+}
 
 export const metadata: Metadata = {
-  title: 'Herihasina',
-  description: 'Explore my portfolio of web development and design projects. Modern, responsive, and beautiful digital experiences.',
-  keywords: ['portfolio', 'web developer', 'designer', 'projects', 'full-stack'],
-  creator: 'Rakotoarivony',
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: 'Herihasina Michael Rakotoarivony | Développeur Fullstack',
+    template: '%s | Herihasina Michael',
+  },
+  description:
+    'Portfolio de Herihasina Michael Rakotoarivony — développeur fullstack. Applications web et mobiles modernes, performantes et centrées sur l’expérience utilisateur.',
+  keywords: [
+    'Herihasina Michael',
+    'Rakotoarivony',
+    'portfolio',
+    'développeur fullstack',
+    'Next.js',
+    'React',
+    'web developer',
+  ],
+  authors: [{ name: 'Herihasina Michael Rakotoarivony' }],
+  creator: 'Herihasina Michael Rakotoarivony',
   icons: {
-    icon: [
-      {
-        url: '/icon-light-32x32.png',
-        media: '(prefers-color-scheme: light)',
-      },
-      {
-        url: '/icon-dark-32x32.png',
-        media: '(prefers-color-scheme: dark)',
-      },
-      {
-        url: '/icon.svg',
-        type: 'image/svg+xml',
-      },
-    ],
-    apple: '/apple-icon.png',
+    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+    apple: [{ url: '/icon.svg', type: 'image/svg+xml' }],
   },
   openGraph: {
     type: 'website',
-    locale: 'en_US',
-    url: 'https://example.com',
-    siteName: 'Professional Portfolio',
-    title: 'Professional Portfolio | Web Developer & Designer',
-    description: 'Explore my portfolio of web development and design projects.',
+    locale: 'fr_FR',
+    alternateLocale: ['en_US'],
+    url: siteUrl,
+    siteName: 'Herihasina Michael — Portfolio',
+    title: 'Herihasina Michael Rakotoarivony | Développeur Fullstack',
+    description:
+      'Applications web et mobiles modernes, performantes et centrées sur l’expérience utilisateur.',
+    images: [ogImage],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Herihasina Michael Rakotoarivony | Développeur Fullstack',
+    description:
+      'Portfolio — développeur fullstack, applications web et mobiles modernes.',
+    images: [ogImage.url],
   },
 }
 
 export const viewport: Viewport = {
   themeColor: [
-    { media: '(prefers-color-scheme: light)', color: '#ffffff' },
+    { media: '(prefers-color-scheme: light)', color: '#e8ecf2' },
     { media: '(prefers-color-scheme: dark)', color: '#0b0e14' },
   ],
   width: 'device-width',
@@ -55,11 +97,14 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en" suppressHydrationWarning>
-      <body className="font-sans antialiased" suppressHydrationWarning>
-        <Providers>
-          {children}
-        </Providers>
+    <html lang="fr" suppressHydrationWarning>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} ${plusJakarta.variable} ${dmSans.variable} font-sans antialiased`}
+        suppressHydrationWarning
+      >
+        <JsonLd />
+        <Providers>{children}</Providers>
+        <Analytics />
       </body>
     </html>
   )

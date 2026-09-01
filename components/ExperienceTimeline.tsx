@@ -2,12 +2,10 @@
 
 import { useEffect, useRef } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Briefcase, GraduationCap } from "lucide-react";
 import type { Experience, Language } from "@/types";
 import { shouldAnimateOnScroll } from "@/utils/motion";
-
-gsap.registerPlugin(ScrollTrigger);
+import { animateTimelineSection } from "@/utils/gsapAnimations";
 
 interface ExperienceTimelineProps {
   items: Experience[];
@@ -26,40 +24,11 @@ export default function ExperienceTimeline({
     if (!timelineRef.current || !shouldAnimateOnScroll()) return;
 
     var ctx = gsap.context(function () {
-      var entries = timelineRef.current?.querySelectorAll(".timeline-entry");
-      if (!entries) return;
-
-      gsap.fromTo(
-        entries,
-        { opacity: 0, x: 40 },
-        {
-          opacity: 1,
-          x: 0,
-          duration: 0.7,
-          stagger: 0.15,
-          scrollTrigger: {
-            trigger: timelineRef.current,
-            start: "top 75%",
-          },
-        },
+      animateTimelineSection(
+        timelineRef.current as Element,
+        ".timeline-entry",
+        ".timeline-line",
       );
-
-      var line = timelineRef.current?.querySelector(".timeline-line");
-      if (line) {
-        gsap.fromTo(
-          line,
-          { scaleY: 0 },
-          {
-            scaleY: 1,
-            duration: 1,
-            ease: "power2.out",
-            scrollTrigger: {
-              trigger: timelineRef.current,
-              start: "top 75%",
-            },
-          },
-        );
-      }
     }, timelineRef);
 
     return function () {
