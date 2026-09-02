@@ -38,19 +38,20 @@ export default function Skills() {
     <section
       id="skills"
       ref={sectionRef}
-      className="relative section-divider px-4 py-16 sm:px-6 sm:py-24 lg:px-8 section-bg-patch-alt"
+      className="snap-section relative section-divider py-16 sm:py-20 lg:py-24 section-blur-surface section-blur-skills"
     >
-      <div className="mx-auto max-w-7xl">
+      <div className="section-shell">
         <div className="skills-header">
           <SectionHeader
-            title={t('skills.title')}
+            titleMain={t('skills.title_main')}
+            titleAccent={t('skills.title_accent')}
             subtitle={t('skills.subtitle')}
           />
         </div>
 
         <div
           ref={gridRef}
-          className="grid grid-cols-1 gap-4 sm:grid-cols-2 sm:gap-5 lg:grid-cols-3"
+          className="grid grid-cols-1 gap-5 sm:grid-cols-2 sm:gap-6 lg:grid-cols-3 lg:gap-7"
         >
           {skillCategories.map(function (category) {
             return (

@@ -37,17 +37,18 @@ export default function Contact() {
     <section
       id="contact"
       ref={sectionRef}
-      className="relative py-24 px-4 sm:px-6 lg:px-8 bg-card/30 section-bg-patch"
+      className="snap-section relative py-16 sm:py-20 lg:py-24 section-blur-surface section-blur-contact"
     >
-      <div className="max-w-7xl mx-auto">
+      <div className="section-shell max-w-7xl">
         <div className="contact-header">
           <SectionHeader
-            title={t("contact.title")}
+            titleMain={t("contact.title_main")}
+            titleAccent={t("contact.title_accent")}
             subtitle={t("contact.subtitle")}
           />
         </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12 items-start">
           <ContactInfo className="contact-left" />
           <ContactForm />
         </div>

@@ -1,6 +1,13 @@
 'use client'
 
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from 'react'
 import gsap from 'gsap'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import SectionHeader from './SectionHeader'
@@ -9,11 +16,29 @@ import ProjectModal from './ProjectModal'
 import { projects } from '@/data/projects'
 import type { Project } from '@/types'
 import { useLanguage } from '@/context/LanguageContext'
-import { shouldAnimateOnScroll, MOTION_EASE_IN_OUT } from '@/utils/motion'
+import { shouldAnimateOnScroll } from '@/utils/motion'
 import { revealSectionHeader } from '@/utils/gsapAnimations'
 
-var INITIAL_PROJECT_INDEX = Math.floor(projects.length / 2)
-var CAROUSEL_DURATION = 0.85
+var CAROUSEL_DURATION = 1.05
+var CAROUSEL_EASE = 'power4.inOut'
+
+function buildExtendedProjects(items: Project[]) {
+  if (items.length === 0) return []
+  if (items.length === 1) return [items[0], items[0], items[0]]
+
+  return [
+    items[items.length - 1],
+    ...items,
+    items[0],
+  ]
+}
+
+function getRealIndex(trackIndex: number, total: number) {
+  if (total <= 1) return 0
+  if (trackIndex === 0) return total - 1
+  if (trackIndex === total + 1) return 0
+  return trackIndex - 1
+}
 
 export default function Projects() {
   var sectionRef = useRef<HTMLDivElement>(null)
@@ -21,57 +46,100 @@ export default function Projects() {
   var viewportRef = useRef<HTMLDivElement>(null)
   var slideRefs = useRef<Array<HTMLDivElement | null>>([])
   var hasPositionedRef = useRef(false)
+  var trackIndexRef = useRef(0)
+  var isAnimatingRef = useRef(false)
+  var skipAnimationRef = useRef(false)
   var { t, language } = useLanguage()
 
-  var [activeIndex, setActiveIndex] = useState(INITIAL_PROJECT_INDEX)
+  var extendedProjects = useMemo(function () {
+    return buildExtendedProjects(projects)
+  }, [])
+
+  var initialTrackIndex = Math.floor(projects.length / 2) + 1
+
+  var [trackIndex, setTrackIndex] = useState(initialTrackIndex)
   var [selectedProject, setSelectedProject] = useState<Project | null>(null)
   var [modalOpen, setModalOpen] = useState(false)
 
-  var centerActiveSlide = useCallback(function (animate: boolean) {
-    var track = trackRef.current
+  trackIndexRef.current = trackIndex
+
+  var activeIndex = getRealIndex(trackIndex, projects.length)
+
+  var getSlideOffset = useCallback(function (index: number) {
     var viewport = viewportRef.current
-    var slide = slideRefs.current[activeIndex]
-    if (!track || !viewport || !slide) return
+    var slide = slideRefs.current[index]
+    if (!viewport || !slide) return 0
 
-    var offset =
-      slide.offsetLeft - viewport.clientWidth / 2 + slide.clientWidth / 2
+    return slide.offsetLeft - viewport.clientWidth / 2 + slide.clientWidth / 2
+  }, [])
 
-    gsap.killTweensOf(track)
+  var moveToTrackIndex = useCallback(
+    function (index: number, animate: boolean, onComplete?: () => void) {
+      var track = trackRef.current
+      if (!track) return
 
-    if (animate && hasPositionedRef.current) {
-      gsap.to(track, {
-        x: -offset,
-        duration: CAROUSEL_DURATION,
-        ease: MOTION_EASE_IN_OUT,
-        overwrite: true,
-      })
-    } else {
-      gsap.set(track, { x: -offset })
-      hasPositionedRef.current = true
-    }
-  }, [activeIndex])
+      var offset = getSlideOffset(index)
+
+      gsap.killTweensOf(track)
+
+      if (animate && hasPositionedRef.current) {
+        isAnimatingRef.current = true
+        gsap.to(track, {
+          x: -offset,
+          duration: CAROUSEL_DURATION,
+          ease: CAROUSEL_EASE,
+          overwrite: true,
+          onComplete: function () {
+            isAnimatingRef.current = false
+            if (onComplete) onComplete()
+          },
+        })
+      } else {
+        gsap.set(track, { x: -offset })
+        hasPositionedRef.current = true
+        if (onComplete) onComplete()
+      }
+    },
+    [getSlideOffset],
+  )
 
   useLayoutEffect(
     function () {
-      slideRefs.current = slideRefs.current.slice(0, projects.length)
+      slideRefs.current = slideRefs.current.slice(0, extendedProjects.length)
 
       requestAnimationFrame(function () {
-        centerActiveSlide(hasPositionedRef.current)
+        var shouldAnimate =
+          hasPositionedRef.current && !skipAnimationRef.current
+        skipAnimationRef.current = false
+
+        moveToTrackIndex(trackIndexRef.current, shouldAnimate, function () {
+          var total = projects.length
+          if (total <= 1) return
+
+          var current = trackIndexRef.current
+          if (current === 0) {
+            skipAnimationRef.current = true
+            setTrackIndex(total)
+          } else if (current === total + 1) {
+            skipAnimationRef.current = true
+            setTrackIndex(1)
+          }
+        })
       })
     },
-    [activeIndex, centerActiveSlide],
+    [trackIndex, moveToTrackIndex, extendedProjects.length],
   )
 
   useEffect(function () {
     function handleResize() {
-      centerActiveSlide(false)
+      moveToTrackIndex(trackIndexRef.current, false)
     }
 
     window.addEventListener('resize', handleResize)
     return function () {
       window.removeEventListener('resize', handleResize)
     }
-  }, [centerActiveSlide])
+  }, [moveToTrackIndex])
 
   useEffect(function () {
     if (!sectionRef.current || !shouldAnimateOnScroll()) return
@@ -79,21 +147,26 @@ export default function Projects() {
     revealSectionHeader(sectionRef.current, '.projects-header')
   }, [])
 
-  var goToSlide = function (index: number) {
-    if (index < 0 || index >= projects.length) return
-    setActiveIndex(index)
+  var goToSlide = function (realIndex: number) {
+    if (projects.length === 0 || isAnimatingRef.current) return
+    var nextTrackIndex = realIndex + 1
+    if (nextTrackIndex === trackIndexRef.current) return
+
+    setTrackIndex(nextTrackIndex)
   }
 
   var handlePrev = function () {
-    goToSlide(activeIndex - 1)
+    if (isAnimatingRef.current || projects.length === 0) return
+    setTrackIndex(trackIndexRef.current - 1)
   }
 
   var handleNext = function () {
-    goToSlide(activeIndex + 1)
+    if (isAnimatingRef.current || projects.length === 0) return
+    setTrackIndex(trackIndexRef.current + 1)
   }
 
-  var handleProjectClick = function (project: Project, index: number) {
-    setActiveIndex(index)
+  var handleProjectClick = function (project: Project, realIndex: number) {
+    setTrackIndex(realIndex + 1)
     setSelectedProject(project)
     setModalOpen(true)
   }
@@ -102,39 +175,46 @@ export default function Projects() {
     <section
       id="projects"
       ref={sectionRef}
-      className="relative section-divider px-4 py-16 sm:px-6 sm:py-24 lg:px-8 section-bg-band"
+      className="snap-section relative section-divider py-16 sm:py-20 lg:py-24 section-blur-surface section-blur-projects"
     >
-      <div className="mx-auto max-w-7xl">
+      <div className="section-shell">
         <div className="projects-header">
           <SectionHeader
-            title={t('projects.title')}
+            titleMain={t('projects.title_main')}
+            titleAccent={t('projects.title_accent')}
             subtitle={t('projects.subtitle')}
           />
         </div>
 
         <div
           ref={viewportRef}
-          className="projects-carousel-viewport relative overflow-hidden"
+          className="projects-carousel-viewport relative overflow-hidden py-2"
         >
           <div
             ref={trackRef}
-            className="flex items-center gap-5 sm:gap-7 will-change-transform"
+            className="flex items-center gap-6 sm:gap-8 lg:gap-10 will-change-transform"
           >
-            {projects.map(function (project, index) {
+            {extendedProjects.map(function (project, index) {
+              var realIndex = getRealIndex(index, projects.length)
+              var isClone =
+                index === 0 || index === extendedProjects.length - 1
+
               return (
                 <div
-                  key={project.id}
+                  key={`${project.id}-${index}`}
                   ref={function (el) {
                     slideRefs.current[index] = el
                   }}
-                  className="w-[min(88vw,420px)] shrink-0 sm:w-[420px]"
+                  className="w-[min(92vw,520px)] shrink-0 sm:w-[520px] lg:w-[580px]"
+                  aria-hidden={isClone && index !== trackIndex}
                 >
                   <ProjectCard
                     project={project}
                     language={language}
-                    isActive={index === activeIndex}
+                    isActive={index === trackIndex}
                     onClick={function () {
-                      handleProjectClick(project, index)
+                      if (isAnimatingRef.current) return
+                      handleProjectClick(project, realIndex)
                     }}
                   />
                 </div>
@@ -147,9 +227,8 @@ export default function Projects() {
           <button
             type="button"
             onClick={handlePrev}
-            disabled={activeIndex === 0}
             aria-label={t('projects.prev')}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-border/50 bg-card/60 text-foreground backdrop-blur-sm transition-all hover:border-foreground/30 hover:bg-card disabled:cursor-not-allowed disabled:opacity-25"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-border/50 bg-card/60 text-foreground backdrop-blur-sm transition-all hover:border-foreground/30 hover:bg-card"
           >
             <ChevronLeft className="h-5 w-5" />
           </button>
@@ -164,7 +243,7 @@ export default function Projects() {
                     goToSlide(index)
                   }}
                   aria-label={`${t('projects.go_to')} ${index + 1}`}
-                  className={`h-2 rounded-full transition-all duration-300 ${
+                  className={`h-2 rounded-full transition-all duration-500 ease-out ${
                     index === activeIndex
                       ? 'w-7 bg-foreground'
                       : 'w-2 bg-muted-foreground/35 hover:bg-muted-foreground/60'
@@ -177,9 +256,8 @@ export default function Projects() {
           <button
             type="button"
             onClick={handleNext}
-            disabled={activeIndex === projects.length - 1}
             aria-label={t('projects.next')}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-border/50 bg-card/60 text-foreground backdrop-blur-sm transition-all hover:border-foreground/30 hover:bg-card disabled:cursor-not-allowed disabled:opacity-25"
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-border/50 bg-card/60 text-foreground backdrop-blur-sm transition-all hover:border-foreground/30 hover:bg-card"
           >
             <ChevronRight className="h-5 w-5" />
           </button>

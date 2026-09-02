@@ -61,24 +61,23 @@ export default function ExperienceTimeline({
                   <h4 className="font-bold text-foreground mb-1">
                     {item.title[language]}
                   </h4>
-                  <p className="text-sm text-accent mb-2">
+                  <p className="text-sm text-accent">
                     {item.company[language]}
                   </p>
-                  <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                    {item.description[language]}
-                  </p>
-                  <div className="flex flex-wrap gap-2">
-                    {item.stack.map(function (tech) {
-                      return (
-                        <span
-                          key={tech}
-                          className="text-xs px-2 py-1 rounded-md bg-background border border-border/60 text-muted-foreground"
-                        >
-                          {tech}
-                        </span>
-                      );
-                    })}
-                  </div>
+                  {item.stack && item.stack.length > 0 && (
+                    <div className="flex flex-wrap gap-2 mt-4">
+                      {item.stack.map(function (tech) {
+                        return (
+                          <span
+                            key={tech}
+                            className="text-xs px-2 py-1 rounded-md bg-background border border-border/60 text-muted-foreground"
+                          >
+                            {tech}
+                          </span>
+                        );
+                      })}
+                    </div>
+                  )}
                 </div>
               </div>
             );

@@ -30,8 +30,8 @@ export interface Experience {
   badge: LanguageText;
   title: LanguageText;
   company: LanguageText;
-  description: LanguageText;
-  stack: string[];
+  description?: LanguageText;
+  stack?: string[];
   type: "work" | "education";
 }
 

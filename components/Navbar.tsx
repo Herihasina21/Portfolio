@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import LanguageSelector from '@/components/LanguageSelector'
 import { useLanguage } from '@/context/LanguageContext'
 import { useActiveSection } from '@/hooks/useActiveSection'
+import { toggleThemeWithTransition } from '@/utils/themeToggle'
+import { cn } from '@/lib/utils'
 
 export default function Navbar() {
   var [isOpen, setIsOpen] = useState(false)
@@ -84,20 +86,35 @@ export default function Navbar() {
               variant="ghost"
               size="icon"
               onClick={function () {
-                setTheme(isDark ? 'light' : 'dark')
+                toggleThemeWithTransition(
+                  setTheme,
+                  isDark ? 'light' : 'dark',
+                )
               }}
               className="rounded-full h-8 w-8 sm:h-9 sm:w-9 text-foreground hover:bg-foreground/10 hover:text-foreground dark:hover:bg-foreground/15 dark:hover:text-foreground"
               aria-label="Toggle theme"
               suppressHydrationWarning
             >
-              <Sun
-                className={`h-4 w-4 text-current ${isDark ? 'block' : 'hidden'}`}
-                suppressHydrationWarning
-              />
-              <Moon
-                className={`h-4 w-4 text-current ${isDark ? 'hidden' : 'block'}`}
-                suppressHydrationWarning
-              />
+              <span className="relative inline-flex h-4 w-4 items-center justify-center">
+                <Sun
+                  className={cn(
+                    'absolute h-4 w-4 text-current transition-all duration-500 ease-out',
+                    isDark
+                      ? 'rotate-0 scale-100 opacity-100'
+                      : 'rotate-90 scale-0 opacity-0',
+                  )}
+                  suppressHydrationWarning
+                />
+                <Moon
+                  className={cn(
+                    'absolute h-4 w-4 text-current transition-all duration-500 ease-out',
+                    isDark
+                      ? '-rotate-90 scale-0 opacity-0'
+                      : 'rotate-0 scale-100 opacity-100',
+                  )}
+                  suppressHydrationWarning
+                />
+              </span>
             </Button>
 
             <LanguageSelector className="hidden sm:block" />

@@ -8,14 +8,14 @@ export const statsData = [
   },
   {
     id: "projects",
-    value: 6,
+    value: 15,
     suffix: "+",
     labelKey: "about.stat.projects",
     icon: "code",
   },
   {
     id: "technologies",
-    value: 15,
+    value: 10,
     suffix: "+",
     labelKey: "about.stat.technologies",
     icon: "layers",

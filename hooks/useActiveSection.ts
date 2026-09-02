@@ -32,8 +32,8 @@ export function useActiveSection() {
         }
       },
       {
-        rootMargin: '-40% 0px -40% 0px',
-        threshold: [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1],
+        rootMargin: '-45% 0px -45% 0px',
+        threshold: [0, 0.25, 0.5, 0.75, 1],
       },
     )
 

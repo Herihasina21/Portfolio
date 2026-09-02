@@ -141,8 +141,50 @@ nav,
 button,
 a,
 input,
-textarea {
-  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+textarea,
+section,
+.portfolio-card,
+.project-carousel-card,
+.skill-category-card,
+.skill-pill {
+  transition:
+    background-color 0.45s ease,
+    color 0.45s ease,
+    border-color 0.45s ease,
+    box-shadow 0.45s ease;
+}
+
+/* View Transition API — smooth theme switch */
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 0.45s;
+  animation-timing-function: ease-in-out;
+}
+
+::view-transition-old(root) {
+  animation-name: theme-fade-out;
+}
+
+::view-transition-new(root) {
+  animation-name: theme-fade-in;
+}
+
+@keyframes theme-fade-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes theme-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* Loading state animation */
@@ -160,6 +202,11 @@ textarea {
 }
 
 @media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation: none !important;
+  }
+
   *,
   *::before,
   *::after {
@@ -180,6 +227,11 @@ textarea {
   .hero-orbit--outer,
   .hero-orbit--inner,
   .hero-blob-frame {
+    animation: none !important;
+  }
+
+  .section-blur-surface::before,
+  .section-blur-surface::after {
     animation: none !important;
   }
 }

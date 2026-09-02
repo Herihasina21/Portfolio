@@ -62,28 +62,28 @@ export default function ProjectCard({
       onClick={onClick}
       aria-current={isActive ? 'true' : undefined}
       className={cn(
-        'project-carousel-card group w-full text-left transition-[transform,opacity,filter] duration-[850ms] ease-[cubic-bezier(0.65,0,0.35,1)]',
+        'project-carousel-card group w-full text-left transition-[transform,opacity,filter] duration-[1050ms] ease-[cubic-bezier(0.22,1,0.36,1)]',
         isActive
-          ? 'scale-100 opacity-100 blur-0'
-          : 'scale-[0.88] opacity-40 blur-[1.5px] sm:blur-[2px]',
+          ? 'scale-100 opacity-100 blur-0 z-10'
+          : 'scale-[0.86] opacity-35 blur-[2px] sm:scale-[0.9] sm:opacity-40',
       )}
     >
       <div
         className={cn(
-          'overflow-hidden rounded-2xl border bg-card transition-[border-color,box-shadow,background-color] duration-[850ms] ease-[cubic-bezier(0.65,0,0.35,1)]',
+          'overflow-hidden rounded-2xl border bg-card transition-[border-color,box-shadow,background-color,transform] duration-[1050ms] ease-[cubic-bezier(0.22,1,0.36,1)]',
           isActive
-            ? 'border-border/70 shadow-2xl shadow-black/30 dark:border-white/10 dark:bg-[#11151c] dark:shadow-black/50'
-            : 'border-border/25 dark:border-white/[0.06] dark:bg-[#0d1016]',
+            ? 'border-border/70 shadow-2xl shadow-black/20 dark:border-white/10 dark:shadow-black/40'
+            : 'border-border/25 dark:border-white/[0.06]',
         )}
       >
-        <div className="relative h-48 overflow-hidden bg-muted/20 sm:h-56">
+        <div className="relative h-52 overflow-hidden project-image-frame sm:h-64 lg:h-72">
           {!showFallback ? (
             <Image
               src={project.image}
               alt={title}
               fill
-              sizes="(max-width: 640px) 88vw, 420px"
-              className="object-cover object-top transition-transform duration-700 group-hover:scale-[1.03]"
+              sizes="(max-width: 640px) 92vw, 580px"
+              className="object-contain object-center p-2 transition-transform duration-700 group-hover:scale-[1.02] sm:p-3"
               onError={function () {
                 setImgError(true)
               }}
@@ -94,7 +94,7 @@ export default function ProjectCard({
               technologies={project.technologies}
             />
           )}
-          <div className="pointer-events-none absolute inset-0 bg-gradient-to-t from-card via-card/10 to-transparent dark:from-[#11151c] dark:via-[#11151c]/10" />
+          <div className="project-image-vignette pointer-events-none absolute inset-0" />
         </div>
 
         <div className="space-y-3 p-5 sm:p-6">

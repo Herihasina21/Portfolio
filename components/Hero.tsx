@@ -225,7 +225,7 @@ export default function Hero() {
     <section
       ref={sectionRef}
       id="home"
-      className="relative flex min-h-[calc(100vh-4rem)] w-full items-center overflow-hidden px-4 pb-14 pt-24 sm:px-6 sm:pb-16 sm:pt-28 lg:px-8 section-bg-patch-alt"
+      className="snap-section relative flex w-full items-center overflow-hidden py-16 pt-24 sm:py-20 sm:pt-28 lg:py-24 section-blur-surface section-blur-hero"
     >
       <div className="absolute inset-0 -z-20 bg-background" />
       <div
@@ -237,13 +237,13 @@ export default function Hero() {
         className="absolute bottom-[15%] right-[10%] -z-10 hidden h-72 w-72 rounded-full bg-accent/6 blur-3xl dark:bg-accent/8 md:block"
       />
 
-      <div className="relative z-10 mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-6 sm:gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:gap-10 lg:grid-cols-2 lg:gap-14">
+      <div className="section-shell relative z-10 grid w-full grid-cols-1 items-center gap-6 sm:gap-8 md:grid-cols-[minmax(0,1fr)_auto] md:gap-10 lg:grid-cols-2 lg:gap-14">
         <div className="order-2 space-y-5 text-center sm:space-y-6 md:order-1 md:max-w-xl md:text-left lg:max-w-none">
           <div ref={badgeRef} className="inline-block">
-            <div className="rounded-full border border-accent/25 bg-accent/8 px-4 py-2 backdrop-blur-md transition-colors hover:bg-accent/12">
-              <p className="text-sm font-semibold text-accent">
-                {t('hero.badge')}
-              </p>
+            <div className="hero-badge">
+              <div className="hero-badge-inner">
+                <p className="hero-badge-text">{t('hero.badge')}</p>
+              </div>
             </div>
           </div>
 
@@ -251,10 +251,12 @@ export default function Hero() {
             ref={nameRef}
             className="text-3xl font-bold leading-[1.1] tracking-tight sm:text-4xl md:text-5xl lg:text-[3.35rem]"
           >
-            <div className="text-foreground">
+            <div className="hero-name-main">
               {splitText('Herihasina Michael')}
             </div>
-            <div className="mt-1 text-accent">{splitText('Rakotoarivony')}</div>
+            <div className="hero-name-accent mt-1">
+              {splitText('Rakotoarivony')}
+            </div>
           </h1>
 
           <p
@@ -273,7 +275,10 @@ export default function Hero() {
               size="lg"
               className="rounded-full border border-accent/30 bg-accent/15 px-8 py-3 font-semibold text-accent shadow-none transition-all duration-300 hover:border-accent/50 hover:bg-accent/25"
             >
-              <a href="#contact">{t('hero.cta_secondary')}</a>
+              <a href="#contact" className="flex items-center gap-2">
+                <Mail className="h-4 w-4" />
+                {t('hero.cta_secondary')}
+              </a>
             </Button>
             <Button
               asChild
@@ -340,7 +345,7 @@ export default function Hero() {
 
             <div ref={portraitRef} className="hero-blob-frame">
               <Image
-                src="/assets/herihasina.jpg"
+                src="/assets/herihasina.jpeg"
                 alt="Herihasina Michael Rakotoarivony"
                 fill
                 priority

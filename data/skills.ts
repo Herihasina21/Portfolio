@@ -16,6 +16,11 @@ export const skillCategories: SkillCategory[] = [
     labelKey: "skills.category.languages",
     items: [
       {
+        name: "Java",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
+        glow: "#f89820",
+      },
+      {
         name: "JavaScript",
         logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
         glow: "#f7df1e",
@@ -26,20 +31,10 @@ export const skillCategories: SkillCategory[] = [
         glow: "#3178c6",
       },
       {
-        name: "Java",
-        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
-        glow: "#f89820",
-      },
-      {
         name: "Python",
         logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
         glow: "#3776ab",
-      },
-      {
-        name: "Kotlin",
-        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kotlin/kotlin-original.svg",
-        glow: "#7f52ff",
-      },
+      }
     ],
   },
   {
@@ -82,6 +77,16 @@ export const skillCategories: SkillCategory[] = [
         logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/csharp/csharp-original.svg",
         glow: "#68217a",
       },
+      {
+        name: "Node.js",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+        glow: "#339933",
+      },
+      {
+        name: "Express.js",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg",
+        glow: "#000000",
+      }
     ],
   },
   {
@@ -94,10 +99,15 @@ export const skillCategories: SkillCategory[] = [
         glow: "#7f52ff",
       },
       {
-        name: "Jetpack Compose",
-        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/android/android-original.svg",
-        glow: "#3ddc84",
+        name: "Flutter",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg",
+        glow: "#02569b",
       },
+      {
+        name: "React Native",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+        glow: "#61dafb",
+      }
     ],
   },
   {
@@ -119,6 +129,11 @@ export const skillCategories: SkillCategory[] = [
         logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mongodb/mongodb-original.svg",
         glow: "#47a248",
       },
+      {
+        name: "Supabase",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/supabase/supabase-original.svg",
+        glow: "#3f4f75",
+      }
     ],
   },
   {
@@ -140,6 +155,21 @@ export const skillCategories: SkillCategory[] = [
         logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-plain.svg",
         glow: "#ffca28",
       },
+      {
+        name: "Postman",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postman/postman-original.svg",
+        glow: "#e95800",
+      },
+      {
+        name: "Figma",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg",
+        glow: "#000000",
+      },
+      {
+        name:"Vercel",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vercel/vercel-original.svg",
+        glow: "#000000",
+      }
     ],
   },
 ];

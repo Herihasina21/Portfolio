@@ -422,7 +422,6 @@ export function setupHoverAnimation(selector: string) {
 }
 
 export function setupSmoothScroll() {
-  var NAV_OFFSET = 64
   var links = document.querySelectorAll('a[href^="#"]')
 
   var handleClick = function (e: Event) {
@@ -435,12 +434,9 @@ export function setupSmoothScroll() {
 
     e.preventDefault()
 
-    var top =
-      target.getBoundingClientRect().top + window.scrollY - NAV_OFFSET
-
-    window.scrollTo({
-      top: top,
+    target.scrollIntoView({
       behavior: 'smooth',
+      block: 'start',
     })
   }
 
