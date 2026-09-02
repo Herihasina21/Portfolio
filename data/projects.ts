@@ -256,6 +256,48 @@ export const projects: Project[] = [
     technologies: ["React.js", "TypeScript", "Authentication", "Subscription Management"],
     link: "https://virtual-2min-detect.vercel.app/login",
   },
+  {
+    id: "6",
+    title: {
+      en: "Lary Beauty Home",
+      fr: "Lary Beauty Home",
+    },
+    description: {
+      en: "Landing website for a home beauty institute — services, booking flow, and contact. Currently in development.",
+      fr: "Site vitrine pour un institut de beauté à domicile : prestations, réservation et contact. Projet en cours de développement.",
+    },
+    projectScope: "personal",
+    problem: {
+      en: "The institute needed an elegant online presence to showcase services and guide clients toward booking an appointment.",
+      fr: "L'institut avait besoin d'une présence en ligne élégante pour présenter ses prestations et orienter les clientes vers la prise de rendez-vous.",
+    },
+    solution: {
+      en: "A responsive Next.js website with a refined UI, dark mode, dedicated sections for services and booking, and clear call-to-action buttons.",
+      fr: "Un site Next.js responsive avec une interface soignée, mode sombre, sections prestations et réservation, et boutons d'appel à l'action clairs.",
+    },
+    features: [
+      {
+        en: "Elegant responsive landing page",
+        fr: "Page d'accueil responsive et élégante",
+      },
+      {
+        en: "Services and booking sections",
+        fr: "Sections prestations et réservation",
+      },
+      {
+        en: "Light and dark theme",
+        fr: "Thème clair et sombre",
+      },
+      {
+        en: "Contact and appointment CTAs",
+        fr: "Contact et prise de rendez-vous",
+      },
+    ],
+    image: "/assets/larybeauty.png",
+    category: "Web Development",
+    technologies: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
+    link: "https://github.com/rakoto-orgs/Lary-Beauty-Home",
+  },
 ];
 
 export function getProjectCategoryLabel(
