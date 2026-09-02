@@ -4,19 +4,22 @@ export interface Skill {
   glow?: string;
 }
 
-export interface SkillTab {
+export interface SkillCategory {
   id: string;
   labelKey: string;
-  icon: string;
   items: Skill[];
 }
 
-export const skillTabs: SkillTab[] = [
+export const skillCategories: SkillCategory[] = [
   {
-    id: "frontend",
-    labelKey: "skills.tab.frontend",
-    icon: "code",
+    id: "languages",
+    labelKey: "skills.category.languages",
     items: [
+      {
+        name: "Java",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
+        glow: "#f89820",
+      },
       {
         name: "JavaScript",
         logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/javascript/javascript-original.svg",
@@ -27,6 +30,17 @@ export const skillTabs: SkillTab[] = [
         logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/typescript/typescript-original.svg",
         glow: "#3178c6",
       },
+      {
+        name: "Python",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
+        glow: "#3776ab",
+      }
+    ],
+  },
+  {
+    id: "frontend",
+    labelKey: "skills.category.frontend",
+    items: [
       {
         name: "React",
         logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
@@ -42,27 +56,11 @@ export const skillTabs: SkillTab[] = [
         logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg",
         glow: "#38bdf8",
       },
-      {
-        name: "HTML5",
-        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/html5/html5-original.svg",
-        glow: "#e34f26",
-      },
-      {
-        name: "CSS3",
-        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg",
-        glow: "#1572b6",
-      },
-      {
-        name: "Kotlin",
-        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kotlin/kotlin-original.svg",
-        glow: "#7f52ff",
-      },
     ],
   },
   {
     id: "backend",
-    labelKey: "skills.tab.backend",
-    icon: "server",
+    labelKey: "skills.category.backend",
     items: [
       {
         name: "Spring Boot",
@@ -75,24 +73,56 @@ export const skillTabs: SkillTab[] = [
         glow: "#092e20",
       },
       {
-        name: "Python",
-        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/python/python-original.svg",
-        glow: "#3776ab",
-      },
-      {
-        name: "Java",
-        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/java/java-original.svg",
-        glow: "#f89820",
-      },
-      {
         name: "C#",
         logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/csharp/csharp-original.svg",
         glow: "#68217a",
       },
       {
+        name: "Node.js",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/nodejs/nodejs-original.svg",
+        glow: "#339933",
+      },
+      {
+        name: "Express.js",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/express/express-original.svg",
+        glow: "#000000",
+      }
+    ],
+  },
+  {
+    id: "mobile",
+    labelKey: "skills.category.mobile",
+    items: [
+      {
+        name: "Kotlin",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/kotlin/kotlin-original.svg",
+        glow: "#7f52ff",
+      },
+      {
+        name: "Flutter",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg",
+        glow: "#02569b",
+      },
+      {
+        name: "React Native",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg",
+        glow: "#61dafb",
+      }
+    ],
+  },
+  {
+    id: "databases",
+    labelKey: "skills.category.databases",
+    items: [
+      {
         name: "PostgreSQL",
         logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postgresql/postgresql-original.svg",
         glow: "#336791",
+      },
+      {
+        name: "MySQL",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",
+        glow: "#00758f",
       },
       {
         name: "MongoDB",
@@ -100,16 +130,15 @@ export const skillTabs: SkillTab[] = [
         glow: "#47a248",
       },
       {
-        name: "MySQL",
-        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/mysql/mysql-original.svg",
-        glow: "#00758f",
-      },
+        name: "Supabase",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/supabase/supabase-original.svg",
+        glow: "#3f4f75",
+      }
     ],
   },
   {
     id: "tools",
-    labelKey: "skills.tab.tools",
-    icon: "wrench",
+    labelKey: "skills.category.tools",
     items: [
       {
         name: "Git",
@@ -122,60 +151,25 @@ export const skillTabs: SkillTab[] = [
         glow: "#2496ed",
       },
       {
-        name: "Gradle",
-        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/gradle/gradle-original.svg",
-        glow: "#02303a",
-      },
-      {
-        name: "Maven",
-        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/maven/maven-original.svg",
-        glow: "#c71a36",
-      },
-      {
         name: "Firebase",
         logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/firebase/firebase-plain.svg",
         glow: "#ffca28",
       },
       {
-        name: "Jetpack Compose",
-        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/android/android-original.svg",
-        glow: "#3ddc84",
+        name: "Postman",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/postman/postman-original.svg",
+        glow: "#e95800",
       },
-    ],
-  },
-  {
-    id: "design",
-    labelKey: "skills.tab.design",
-    icon: "palette",
-    items: [
       {
         name: "Figma",
         logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg",
-        glow: "#f24e1e",
+        glow: "#000000",
       },
       {
-        name: "UI/UX",
-        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/figma/figma-original.svg",
-        glow: "#a78bfa",
-      },
-      {
-        name: "Responsive",
-        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/css3/css3-original.svg",
-        glow: "#38bdf8",
-      },
-      {
-        name: "Tailwind",
-        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg",
-        glow: "#38bdf8",
-      },
+        name:"Vercel",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vercel/vercel-original.svg",
+        glow: "#000000",
+      }
     ],
   },
 ];
-
-// Legacy export for backward compatibility
-export const skillsData = skillTabs.map(function (tab) {
-  return {
-    title: tab.labelKey,
-    items: tab.items,
-  };
-});

@@ -2,57 +2,30 @@
 
 import { useRef, useEffect } from "react";
 import gsap from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
 import SectionHeader from "./SectionHeader";
 import { useLanguage } from "@/context/LanguageContext";
 import ContactInfo from "./ContactInfo";
 import ContactForm from "./ContactForm";
 import { shouldAnimateOnScroll } from "@/utils/motion";
-
-gsap.registerPlugin(ScrollTrigger);
+import {
+  revealSectionHeader,
+  revealSplitColumns,
+} from "@/utils/gsapAnimations";
 
 export default function Contact() {
   var sectionRef = useRef<HTMLDivElement>(null);
   var { t } = useLanguage();
 
   useEffect(function () {
-    if (!shouldAnimateOnScroll()) return;
+    if (!sectionRef.current || !shouldAnimateOnScroll()) return;
 
     var ctx = gsap.context(function () {
-      if (!sectionRef.current) return;
-
-      var leftItems = sectionRef.current.querySelectorAll(".contact-card");
-      gsap.fromTo(
-        leftItems,
-        { opacity: 0, x: -30 },
-        {
-          opacity: 1,
-          x: 0,
-          duration: 0.6,
-          stagger: 0.1,
-          scrollTrigger: {
-            trigger: sectionRef.current,
-            start: "top 70%",
-          },
-        },
+      revealSectionHeader(sectionRef.current as Element, ".contact-header");
+      revealSplitColumns(
+        sectionRef.current as Element,
+        ".contact-left",
+        ".contact-form-panel",
       );
-
-      var form = sectionRef.current.querySelector(".fade-in-item");
-      if (form) {
-        gsap.fromTo(
-          form,
-          { opacity: 0, x: 30 },
-          {
-            opacity: 1,
-            x: 0,
-            duration: 0.7,
-            scrollTrigger: {
-              trigger: sectionRef.current,
-              start: "top 70%",
-            },
-          },
-        );
-      }
     }, sectionRef);
 
     return function () {
@@ -64,16 +37,19 @@ export default function Contact() {
     <section
       id="contact"
       ref={sectionRef}
-      className="relative py-24 px-4 sm:px-6 lg:px-8 bg-card/30"
+      className="snap-section relative py-16 sm:py-20 lg:py-24 section-blur-surface section-blur-contact"
     >
-      <div className="max-w-7xl mx-auto">
-        <SectionHeader
-          title={t("contact.title")}
-          subtitle={t("contact.subtitle")}
-        />
+      <div className="section-shell max-w-7xl">
+        <div className="contact-header">
+          <SectionHeader
+            titleMain={t("contact.title_main")}
+            titleAccent={t("contact.title_accent")}
+            subtitle={t("contact.subtitle")}
+          />
+        </div>
 
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-start">
-          <ContactInfo />
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-2 lg:gap-12 items-start">
+          <ContactInfo className="contact-left" />
           <ContactForm />
         </div>
       </div>

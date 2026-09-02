@@ -3,34 +3,46 @@
 import { useState, useEffect } from 'react'
 
 export function useActiveSection() {
-  const [activeSection, setActiveSection] = useState('home')
+  var [activeSection, setActiveSection] = useState('home')
 
-  useEffect(() => {
-    const sections = document.querySelectorAll('section[id]')
+  useEffect(function () {
+    var sections = document.querySelectorAll('section[id]')
+    if (!sections.length) return
 
-    const observer = new IntersectionObserver(
-      (entries) => {
-        let visibleSection = ''
+    var ratios = new Map<string, number>()
 
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            visibleSection = entry.target.id
+    var observer = new IntersectionObserver(
+      function (entries) {
+        entries.forEach(function (entry) {
+          ratios.set(entry.target.id, entry.intersectionRatio)
+        })
+
+        var bestId = 'home'
+        var bestRatio = 0
+
+        ratios.forEach(function (ratio, id) {
+          if (ratio > bestRatio) {
+            bestRatio = ratio
+            bestId = id
           }
         })
 
-        if (visibleSection) {
-          setActiveSection(visibleSection)
+        if (bestRatio > 0) {
+          setActiveSection(bestId)
         }
       },
       {
-        threshold: 0.6
-      }
+        rootMargin: '-45% 0px -45% 0px',
+        threshold: [0, 0.25, 0.5, 0.75, 1],
+      },
     )
 
-    sections.forEach((section) => observer.observe(section))
+    sections.forEach(function (section) {
+      observer.observe(section)
+    })
 
-    return () => {
-      sections.forEach((section) => observer.unobserve(section))
+    return function () {
+      observer.disconnect()
     }
   }, [])
 

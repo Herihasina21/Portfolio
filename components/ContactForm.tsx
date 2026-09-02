@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useRef } from "react";
-import gsap from "gsap";
+import { shakeElement } from "@/utils/gsapAnimations";
+import emailjs from "@emailjs/browser";
 import { Send, User, Mail, MessageSquare, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
@@ -42,21 +43,7 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
     if (!formRef.current) return;
     var el = formRef.current.querySelector(`[data-field="${fieldName}"]`);
     if (!el) return;
-    gsap.fromTo(
-      el,
-      { x: 0 },
-      {
-        x: 0,
-        duration: 0.45,
-        ease: "power2.out",
-        keyframes: [
-          { x: -8, duration: 0.08 },
-          { x: 8, duration: 0.08 },
-          { x: -4, duration: 0.08 },
-          { x: 0, duration: 0.08 },
-        ],
-      },
-    );
+    shakeElement(el as HTMLElement);
   };
 
   var handleBlur = function (
@@ -109,27 +96,52 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
       return;
     }
 
+    var serviceId = process.env.NEXT_PUBLIC_EMAILJS_SERVICE_ID;
+    var templateId = process.env.NEXT_PUBLIC_EMAILJS_TEMPLATE_ID;
+    var publicKey = process.env.NEXT_PUBLIC_EMAILJS_PUBLIC_KEY;
+
+    if (!serviceId || !templateId || !publicKey) {
+      toast({
+        title: t("contact.config_error"),
+        description: t("contact.config_error_description"),
+        variant: "destructive",
+        duration: 6000,
+      });
+      return;
+    }
+
     setIsLoading(true);
 
     try {
-      await new Promise(function (resolve) {
-        setTimeout(resolve, 1000);
-      });
+      await emailjs.send(
+        serviceId,
+        templateId,
+        {
+          from_name: formData.name,
+          from_email: formData.email,
+          subject: formData.subject,
+          message: formData.message,
+        },
+        publicKey,
+      );
 
       toast({
         title: t("contact.success"),
         description: t("contact.success_description"),
+        variant: "success",
+        duration: 5000,
       });
 
       setFormData({ name: "", email: "", subject: "", message: "" });
       setFieldErrors({});
       setTouched({});
       setSubmitAttempted(false);
-    } catch (error) {
+    } catch {
       toast({
         title: t("contact.error"),
         description: t("contact.error_description"),
         variant: "destructive",
+        duration: 6000,
       });
     } finally {
       setIsLoading(false);
@@ -186,7 +198,7 @@ export default function ContactForm({ className = "" }: ContactFormProps) {
       ref={formRef}
       onSubmit={handleSubmit}
       noValidate
-      className={`fade-in-item portfolio-card p-6 sm:p-8 space-y-5 ${className}`}
+      className={`contact-form-panel portfolio-card p-6 sm:p-8 space-y-5 ${className}`}
     >
       <div>
         <h3 className="text-xl font-bold text-foreground mb-1">

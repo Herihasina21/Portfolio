@@ -12,7 +12,6 @@ export function Providers({ children }: { children: ReactNode }) {
       attribute="class"
       defaultTheme="dark"
       enableSystem={false}
-      disableTransitionOnChange
     >
       <LanguageProvider>
         <SmoothScroll />

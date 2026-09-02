@@ -2,7 +2,6 @@
 
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
-import { ScrollTrigger } from 'gsap/ScrollTrigger'
 import { Calendar, Code, Globe, Layers } from 'lucide-react'
 import SectionHeader from './SectionHeader'
 import ExperienceTimeline from './ExperienceTimeline'
@@ -10,9 +9,11 @@ import { experiences } from '@/data/experience'
 import { statsData } from '@/data/stats'
 import { useLanguage } from '@/context/LanguageContext'
 import { shouldAnimateOnScroll } from '@/utils/motion'
-import { animateCounter } from '@/utils/gsapAnimations'
-
-gsap.registerPlugin(ScrollTrigger)
+import {
+  animateCounter,
+  revealOnScroll,
+  revealSectionHeader,
+} from '@/utils/gsapAnimations'
 
 var statIcons = {
   calendar: Calendar,
@@ -28,48 +29,29 @@ export default function About() {
   var { t, language } = useLanguage()
 
   useEffect(function () {
-    if (!shouldAnimateOnScroll()) return
+    if (!sectionRef.current || !shouldAnimateOnScroll()) return
 
     var ctx = gsap.context(function () {
+      revealSectionHeader(sectionRef.current as Element, '.about-header')
+
       if (statsRef.current) {
-        var cards = statsRef.current.querySelectorAll('.stat-card')
-        gsap.fromTo(
-          cards,
-          { opacity: 0, y: 30 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.6,
-            stagger: 0.1,
-            scrollTrigger: {
-              trigger: statsRef.current,
-              start: 'top 80%',
-            },
-          },
-        )
+        revealOnScroll(statsRef.current, '.stat-card', {
+          y: 32,
+          stagger: 0.1,
+          scale: 0.96,
+        })
 
         statsRef.current.querySelectorAll('.stat-value').forEach(function (el) {
           var target = Number(el.getAttribute('data-value') ?? 0)
-          animateCounter(el as HTMLElement, 0, target, 1.5)
+          animateCounter(el as HTMLElement, 0, target, 1.6)
         })
       }
 
       if (storyRef.current) {
-        var paragraphs = storyRef.current.querySelectorAll('.story-item')
-        gsap.fromTo(
-          paragraphs,
-          { opacity: 0, y: 20 },
-          {
-            opacity: 1,
-            y: 0,
-            duration: 0.7,
-            stagger: 0.12,
-            scrollTrigger: {
-              trigger: storyRef.current,
-              start: 'top 75%',
-            },
-          },
-        )
+        revealOnScroll(storyRef.current, '.story-item', {
+          y: 26,
+          stagger: 0.14,
+        })
       }
     }, sectionRef)
 
@@ -82,13 +64,16 @@ export default function About() {
     <section
       id="about"
       ref={sectionRef}
-      className="relative py-24 px-4 sm:px-6 lg:px-8 pb-32"
+      className="snap-section relative py-16 sm:py-20 lg:py-24 section-divider section-blur-surface section-blur-about"
     >
-      <div className="max-w-7xl mx-auto">
-        <SectionHeader
-          title={t('about.title')}
-          subtitle={t('about.subtitle_short')}
-        />
+      <div className="section-shell max-w-7xl">
+        <div className="about-header">
+          <SectionHeader
+            titleMain={t('about.title_main')}
+            titleAccent={t('about.title_accent')}
+            subtitle={t('about.subtitle_short')}
+          />
+        </div>
 
         <div ref={statsRef} className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-16">
           {statsData.map(function (stat) {
