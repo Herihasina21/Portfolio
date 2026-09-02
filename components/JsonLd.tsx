@@ -9,7 +9,7 @@ export default function JsonLd() {
     '@type': 'Person',
     name: 'Herihasina Michael Rakotoarivony',
     url: siteUrl,
-    jobTitle: 'Développeur Fullstack',
+    jobTitle: 'Développeur Fullstack Junior',
     email: 'herihasinamichael@gmail.com',
     sameAs: [SOCIAL_LINKS.github, SOCIAL_LINKS.linkedin],
     knowsAbout: [

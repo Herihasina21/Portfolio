@@ -31,25 +31,25 @@ const dmSans = DM_Sans({
 const siteUrl = getSiteUrl()
 
 const ogImage = {
-  url: '/assets/herihasina.jpg',
+  url: '/assets/herihasina.jpeg',
   width: 1200,
   height: 1200,
-  alt: 'Herihasina Michael Rakotoarivony — Développeur Fullstack',
+  alt: 'Herihasina Michael Rakotoarivony — Développeur Fullstack Junior',
 }
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: 'Herihasina Michael Rakotoarivony | Développeur Fullstack',
-    template: '%s | Herihasina Michael',
+    default: 'Herihasina Michael Rakotoarivony | Développeur Fullstack Junior',
+    template: '%s | Herihasina Michael Rakotoarivony',
   },
   description:
-    'Portfolio de Herihasina Michael Rakotoarivony — développeur fullstack. Applications web et mobiles modernes, performantes et centrées sur l’expérience utilisateur.',
+    'Portfolio de Herihasina Michael Rakotoarivony — développeur fullstack junior. Applications web et mobiles modernes, performantes et centrées sur l’expérience utilisateur.',
   keywords: [
     'Herihasina Michael',
     'Rakotoarivony',
     'portfolio',
-    'développeur fullstack',
+    'développeur fullstack junior',
     'Next.js',
     'React',
     'web developer',
@@ -57,25 +57,32 @@ export const metadata: Metadata = {
   authors: [{ name: 'Herihasina Michael Rakotoarivony' }],
   creator: 'Herihasina Michael Rakotoarivony',
   icons: {
-    icon: [{ url: '/icon.svg', type: 'image/svg+xml' }],
-    apple: [{ url: '/icon.svg', type: 'image/svg+xml' }],
+    icon: [
+      { url: '/favicon.ico', sizes: 'any' },
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+      { url: '/favicon-96x96.png', sizes: '96x96', type: 'image/png' },
+    ],
+    apple: [
+      { url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' },
+    ],
   },
+  manifest: '/site.webmanifest',
   openGraph: {
     type: 'website',
     locale: 'fr_FR',
     alternateLocale: ['en_US'],
     url: siteUrl,
-    siteName: 'Herihasina Michael — Portfolio',
-    title: 'Herihasina Michael Rakotoarivony | Développeur Fullstack',
+    siteName: 'Herihasina Michael Rakotoarivony — Portfolio',
+    title: 'Herihasina Michael Rakotoarivony | Développeur Fullstack Junior',
     description:
       'Applications web et mobiles modernes, performantes et centrées sur l’expérience utilisateur.',
     images: [ogImage],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Herihasina Michael Rakotoarivony | Développeur Fullstack',
+    title: 'Herihasina Michael Rakotoarivony | Développeur Fullstack Junior',
     description:
-      'Portfolio — développeur fullstack, applications web et mobiles modernes.',
+      'Portfolio — développeur fullstack junior, applications web et mobiles modernes.',
     images: [ogImage.url],
   },
 }
