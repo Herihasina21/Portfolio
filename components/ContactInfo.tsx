@@ -2,7 +2,12 @@
 
 import { Mail, Phone, MapPin, Github, Linkedin, Circle } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
-import { SOCIAL_LINKS } from "@/constants/social";
+import {
+  SOCIAL_LINKS,
+  CONTACT_EMAIL,
+  CONTACT_PHONE,
+  CONTACT_LOCATION,
+} from "@/constants/social";
 
 interface ContactInfoProps {
   className?: string;
@@ -15,20 +20,20 @@ export default function ContactInfo({ className = "" }: ContactInfoProps) {
     {
       icon: Mail,
       labelKey: "contact.email_label_info",
-      value: "herihasinamichael@gmail.com",
+      value: CONTACT_EMAIL,
       href: SOCIAL_LINKS.email,
     },
     {
       icon: Phone,
       labelKey: "contact.phone_label",
-      value: "+261 34 32 650 80",
-      href: "tel:+261343265080",
+      value: CONTACT_PHONE.display,
+      href: SOCIAL_LINKS.phone,
     },
     {
       icon: MapPin,
       labelKey: "contact.location_label",
-      value: "Antananarivo, Madagascar",
-      href: "#contact",
+      value: CONTACT_LOCATION.display,
+      href: CONTACT_LOCATION.href,
     },
   ];
 
