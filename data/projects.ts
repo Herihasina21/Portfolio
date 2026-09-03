@@ -15,7 +15,26 @@ var SCOPE_LABELS: Record<ProjectScope, { en: string; fr: string }> = {
     en: "PERSONAL PROJECT",
     fr: "PROJET PERSONNEL",
   },
+  freelance: {
+    en: "FREELANCE PROJECT",
+    fr: "PROJET FREELANCE",
+  },
 };
+
+var PLATFORM_LABELS = {
+  web: {
+    en: "WEB APPLICATION",
+    fr: "APPLICATION WEB",
+  },
+  mobile: {
+    en: "MOBILE APPLICATION",
+    fr: "APPLICATION MOBILE",
+  },
+} as const;
+
+function getProjectPlatform(category: string): keyof typeof PLATFORM_LABELS {
+  return category.toLowerCase().includes("mobile") ? "mobile" : "web";
+}
 
 export function hasLiveProjectLink(link: string | undefined): boolean {
   if (!link) return false;
@@ -221,17 +240,17 @@ export const projects: Project[] = [
       fr: "Izy M'Lay Stratégie",
     },
     description: {
-      en: "Web platform for virtual sports and casino strategies, with memberships, paid subscriptions, and admin-managed access.",
-      fr: "Plateforme web de sport virtuel et casino : stratégies, abonnements payants et gestion des accès par l'administrateur.",
+      en: "Web platform for virtual sports and casino strategies, with paid subscriptions, admin-managed access, and real-time round data via Cloudflare Workers and Supabase.",
+      fr: "Plateforme web de stratégies sport virtuel et casino, avec abonnements payants, accès géré par l'administrateur, et récupération de données de rounds en temps réel via Cloudflare Workers et Supabase.",
     },
     projectScope: "personal",
     problem: {
-      en: "Users needed a centralized platform to access strategies, subscribe to leagues or casino content, and manage their accounts securely.",
-      fr: "Les utilisateurs avaient besoin d'une plateforme centralisée pour accéder aux stratégies, s'abonner aux ligues ou au casino et gérer leurs comptes en toute sécurité.",
+      en: "Users needed a centralized platform to access strategies, manage subscriptions securely, and follow live virtual-sport rounds without exposing sensitive API traffic.",
+      fr: "Les utilisateurs avaient besoin d'une plateforme centralisée pour accéder aux stratégies, gérer leurs abonnements en toute sécurité, et suivre les rounds de sport virtuel en live sans exposer le trafic API sensible.",
     },
     solution: {
-      en: "A web app with authentication, admin account approval, subscription plans, and integration with Facebook for tutorials and support.",
-      fr: "Application web avec authentification, validation des comptes par l'administrateur, formules d'abonnement et intégration Facebook pour tutoriels et support.",
+      en: "A React and TypeScript web app with secure accounts, subscription access, and live round updates for virtual sports leagues, powered by Supabase and Cloudflare Workers.",
+      fr: "Une application web React et TypeScript avec comptes sécurisés, accès par abonnement, et mises à jour en direct des rounds pour les ligues de sport virtuel, grâce à Supabase et Cloudflare Workers.",
     },
     features: [
       {
@@ -247,13 +266,24 @@ export const projects: Project[] = [
         fr: "Accès aux stratégies Aviator et CosmoX",
       },
       {
-        en: "Facebook community integration",
-        fr: "Intégration de la communauté Facebook",
+        en: "Real-time round data via Cloudflare Worker",
+        fr: "Données de rounds en temps réel via Cloudflare Worker",
+      },
+      {
+        en: "Supabase auth, database and caching",
+        fr: "Auth, base de données et cache avec Supabase",
       },
     ],
     image: "/assets/ims.png",
     category: "Web Development",
-    technologies: ["React.js", "TypeScript", "Authentication", "Subscription Management"],
+    technologies: [
+      "React.js",
+      "TypeScript",
+      "Vite",
+      "Tailwind CSS",
+      "Supabase",
+      "Cloudflare Workers",
+    ],
     link: "https://virtual-2min-detect.vercel.app/login",
   },
   {
@@ -263,10 +293,10 @@ export const projects: Project[] = [
       fr: "Lary Beauty Home",
     },
     description: {
-      en: "Landing website for a home beauty institute — services, booking flow, and contact. Currently in development.",
-      fr: "Site vitrine pour un institut de beauté à domicile : prestations, réservation et contact. Projet en cours de développement.",
+      en: "Freelance landing website for a home beauty institute — services, booking flow, and contact. Currently in development.",
+      fr: "Site vitrine freelance pour un institut de beauté à domicile : prestations, réservation et contact. Projet en cours de développement.",
     },
-    projectScope: "personal",
+    projectScope: "freelance",
     problem: {
       en: "The institute needed an elegant online presence to showcase services and guide clients toward booking an appointment.",
       fr: "L'institut avait besoin d'une présence en ligne élégante pour présenter ses prestations et orienter les clientes vers la prise de rendez-vous.",
@@ -308,5 +338,9 @@ export function getProjectCategoryLabel(
     return project.categoryLabel[language];
   }
 
-  return SCOPE_LABELS[project.projectScope][language];
+  var scopeLabel = SCOPE_LABELS[project.projectScope][language];
+  var platformLabel =
+    PLATFORM_LABELS[getProjectPlatform(project.category)][language];
+
+  return scopeLabel + " · " + platformLabel;
 }

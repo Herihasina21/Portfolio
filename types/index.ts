@@ -3,7 +3,7 @@ export type LanguageText = {
   fr: string;
 };
 
-export type ProjectScope = "academic" | "professional" | "personal";
+export type ProjectScope = "academic" | "professional" | "personal" | "freelance";
 
 export interface Project {
   id: string;

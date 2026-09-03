@@ -11,7 +11,7 @@ export const experiences: Experience[] = [
     },
     company: {
       en: "National School of Computer Science (E.N.I) — Madagascar",
-      fr: "École Nationale de l'Informatique (E.N.I) — Madagascar",
+      fr: "École Nationale d'Informatique (E.N.I) — Madagascar",
     },
     type: "education",
   },
@@ -25,7 +25,7 @@ export const experiences: Experience[] = [
     },
     company: {
       en: "National School of Computer Science (E.N.I) — Madagascar",
-      fr: "École Nationale de l'Informatique (E.N.I) — Madagascar",
+      fr: "École Nationale d'Informatique (E.N.I) — Madagascar",
     },
     type: "education",
   },
@@ -39,7 +39,7 @@ export const experiences: Experience[] = [
     },
     company: {
       en: "National School of Computer Science (E.N.I) — Madagascar",
-      fr: "École Nationale de l'Informatique (E.N.I) — Madagascar",
+      fr: "École Nationale d'Informatique (E.N.I) — Madagascar",
     },
     type: "education",
   },
@@ -53,7 +53,7 @@ export const experiences: Experience[] = [
     },
     company: {
       en: "National School of Computer Science (E.N.I) — Madagascar",
-      fr: "École Nationale de l'Informatique (E.N.I) — Madagascar",
+      fr: "École Nationale d'Informatique (E.N.I) — Madagascar",
     },
     type: "education",
   },
