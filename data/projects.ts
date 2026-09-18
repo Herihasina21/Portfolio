@@ -240,8 +240,8 @@ export const projects: Project[] = [
       fr: "Izy M'Lay Stratégie",
     },
     description: {
-      en: "Web platform for virtual sports and casino strategies, with paid subscriptions, admin-managed access, and real-time round data via Cloudflare Workers and Supabase.",
-      fr: "Plateforme web de stratégies sport virtuel et casino, avec abonnements payants, accès géré par l'administrateur, et récupération de données de rounds en temps réel via Cloudflare Workers et Supabase.",
+      en: "Web platform for virtual sports and casino strategies, with paid subscriptions, staff-managed payment activation, and real-time round data via Cloudflare Workers and Supabase.",
+      fr: "Plateforme web de stratégies sport virtuel et casino, avec abonnements payants, activation des paiements gérée par le staff, et récupération de données de rounds en temps réel via Cloudflare Workers et Supabase.",
     },
     projectScope: "personal",
     problem: {
@@ -249,29 +249,33 @@ export const projects: Project[] = [
       fr: "Les utilisateurs avaient besoin d'une plateforme centralisée pour accéder aux stratégies, gérer leurs abonnements en toute sécurité, et suivre les rounds de sport virtuel en live sans exposer le trafic API sensible.",
     },
     solution: {
-      en: "A React and TypeScript web app with secure accounts, subscription access, and live round updates for virtual sports leagues, powered by Supabase and Cloudflare Workers.",
-      fr: "Une application web React et TypeScript avec comptes sécurisés, accès par abonnement, et mises à jour en direct des rounds pour les ligues de sport virtuel, grâce à Supabase et Cloudflare Workers.",
+      en: "A React and TypeScript web app with instant account access, subscription-gated features, and live round updates for virtual sports leagues, powered by Supabase and Cloudflare Workers.",
+      fr: "Une application web React et TypeScript avec accès immédiat au compte, fonctionnalités liées à l'abonnement, et mises à jour en direct des rounds pour les ligues de sport virtuel, grâce à Supabase et Cloudflare Workers.",
     },
     features: [
       {
-        en: "Login and registration with admin approval",
-        fr: "Connexion et inscription avec validation admin",
+        en: "Instant login and registration",
+        fr: "Connexion et inscription immédiates",
       },
       {
-        en: "Paid subscriptions (Leagues & Casino)",
-        fr: "Abonnements payants (Ligues et Casino)",
+        en: "Paid subscriptions (Leagues, Casino & Combo)",
+        fr: "Abonnements payants (Ligues, Casino et Combo)",
       },
       {
         en: "Aviator and CosmoX strategy access",
         fr: "Accès aux stratégies Aviator et CosmoX",
       },
       {
+        en: "Built-in tutorials and group chat",
+        fr: "Tutoriels intégrés et chat de groupe",
+      },
+      {
         en: "Real-time round data via Cloudflare Worker",
         fr: "Données de rounds en temps réel via Cloudflare Worker",
       },
       {
-        en: "Supabase auth, database and caching",
-        fr: "Auth, base de données et cache avec Supabase",
+        en: "Supabase database, auth flow and caching",
+        fr: "Base de données, comptes et cache avec Supabase",
       },
     ],
     image: "/assets/ims.png",
