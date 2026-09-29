@@ -181,9 +181,12 @@ export default function Projects() {
       return
     }
 
-    setTrackIndex(realIndex + 1)
     setSelectedProject(project)
     setModalOpen(true)
+
+    if (getRealIndex(trackIndexRef.current, projects.length) !== realIndex) {
+      setTrackIndex(realIndex + 1)
+    }
   }
 
   var handlePointerDown = function (
@@ -191,9 +194,6 @@ export default function Projects() {
   ) {
     if (event.button !== 0) return
     if (isAnimatingRef.current || projects.length <= 1) return
-
-    var track = trackRef.current
-    if (!track) return
 
     pointerIdRef.current = event.pointerId
     dragStartXRef.current = event.clientX
@@ -203,9 +203,6 @@ export default function Projects() {
     isDraggingRef.current = true
     isHorizontalSwipeRef.current = false
     didSwipeRef.current = false
-
-    gsap.killTweensOf(track)
-    event.currentTarget.setPointerCapture(event.pointerId)
   }
 
   var handlePointerMove = function (
@@ -224,14 +221,17 @@ export default function Projects() {
       Math.abs(deltaX) > Math.abs(deltaY)
     ) {
       isHorizontalSwipeRef.current = true
+      var track = trackRef.current
+      if (track) gsap.killTweensOf(track)
+      event.currentTarget.setPointerCapture(event.pointerId)
     }
 
     if (!isHorizontalSwipeRef.current) return
 
-    var track = trackRef.current
-    if (!track) return
+    var trackEl = trackRef.current
+    if (!trackEl) return
 
-    gsap.set(track, {
+    gsap.set(trackEl, {
       x: -(dragOriginOffsetRef.current - deltaX),
     })
   }
@@ -258,15 +258,14 @@ export default function Projects() {
       event.currentTarget.releasePointerCapture(event.pointerId)
     }
 
-    if (!wasHorizontal || Math.abs(deltaX) < SWIPE_THRESHOLD) {
-      if (wasHorizontal) {
-        didSwipeRef.current = true
-      }
+    if (!wasHorizontal) return
+
+    didSwipeRef.current = true
+
+    if (Math.abs(deltaX) < SWIPE_THRESHOLD) {
       moveToTrackIndex(trackIndexRef.current, true)
       return
     }
-
-    didSwipeRef.current = true
 
     if (deltaX < 0) {
       handleNext()
@@ -321,7 +320,6 @@ export default function Projects() {
                     language={language}
                     isActive={index === trackIndex}
                     onClick={function () {
-                      if (isAnimatingRef.current) return
                       handleProjectClick(project, realIndex)
                     }}
                   />
