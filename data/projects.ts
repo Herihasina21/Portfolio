@@ -158,12 +158,12 @@ export const projects: Project[] = [
     },
     features: [
       {
-        en: "Employee and salary management",
-        fr: "Gestion des employés et des salaires",
+        en: "Departments, employees and salary management",
+        fr: "Gestion des départements, des employés et des salaires",
       },
       {
-        en: "Bonuses and deductions",
-        fr: "Bonus et déductions",
+        en: "Bonuses and deductions management",
+        fr: "Gestion des bonus et des déductions",
       },
       {
         en: "PDF payslip generation",
@@ -331,6 +331,68 @@ export const projects: Project[] = [
     category: "Web Development",
     technologies: ["Next.js", "React", "TypeScript", "Tailwind CSS"],
     link: "https://github.com/rakoto-orgs/Lary-Beauty-Home",
+  },
+  {
+    id: "7",
+    title: {
+      en: "ExamGenAI",
+      fr: "ExamGenAI",
+    },
+    description: {
+      en: "Team academic project: AI exam generator from course documents, with chapter extraction, question editing, and PDF/Word export.",
+      fr: "Projet académique en équipe: générateur d'examens par IA à partir de documents de cours, avec extraction de chapitres, édition des questions et export PDF/Word.",
+    },
+    projectScope: "academic",
+    problem: {
+      en: "Teachers need a faster way to turn course materials into structured exams without writing every question by hand.",
+      fr: "Les enseignants ont besoin d'un moyen plus rapide de transformer des supports de cours en examens structurés, sans rédiger chaque question à la main.",
+    },
+    solution: {
+      en: "A full-stack app with a React frontend on Vercel and a Spring Boot API on Render, using Supabase for PostgreSQL and Google Gemini for exam generation.",
+      fr: "Application full-stack avec frontend React sur Vercel et API Spring Boot sur Render, PostgreSQL via Supabase et génération d'examens via Google Gemini.",
+    },
+    features: [
+      {
+        en: "Course upload (PDF, Word, TXT)",
+        fr: "Upload de cours (PDF, Word, TXT)",
+      },
+      {
+        en: "Automatic chapter extraction",
+        fr: "Extraction automatique des chapitres",
+      },
+      {
+        en: "AI exam generation (MCQ, true/false, open questions)",
+        fr: "Génération d'examens par IA (QCM, vrai/faux, questions ouvertes)",
+      },
+      {
+        en: "Question editing",
+        fr: "Édition des questions",
+      },
+      {
+        en: "Export to PDF and Word",
+        fr: "Export PDF et Word",
+      },
+      {
+        en: "Production deploy on Vercel, Render and Supabase",
+        fr: "Déploiement en production sur Vercel, Render et Supabase",
+      },
+    ],
+    image: "/assets/examgenai.png",
+    category: "Web Development",
+    technologies: [
+      "React.js",
+      "Vite",
+      "Tailwind CSS",
+      "Java",
+      "Spring Boot",
+      "PostgreSQL",
+      "Supabase",
+      "Google Gemini",
+      "Vercel",
+      "Render",
+    ],
+    link: "https://frontend-examenai-jcmg.vercel.app/",
+    github: "https://github.com/Herihasina21/backend-examgenai",
   },
 ];
 
