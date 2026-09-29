@@ -211,22 +211,22 @@ export function animateModalIn(container: HTMLElement) {
   if (image) {
     tl.fromTo(
       image,
-      { opacity: 0, scale: 1.08, y: 12 },
-      { opacity: 1, scale: 1, y: 0, duration: 0.65 },
+      { opacity: 0, scale: 1.03, y: 8 },
+      { opacity: 1, scale: 1, y: 0, duration: 0.28 },
       0,
     )
   }
 
   tl.fromTo(
     items,
-    { opacity: 0, y: 28 },
+    { opacity: 0, y: 14 },
     {
       opacity: 1,
       y: 0,
-      duration: 0.58,
-      stagger: 0.08,
+      duration: 0.26,
+      stagger: 0.035,
     },
-    image ? 0.14 : 0,
+    image ? 0.05 : 0,
   )
 
   return tl

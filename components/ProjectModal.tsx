@@ -1,7 +1,5 @@
 "use client";
 
-import { useEffect, useRef } from "react";
-import gsap from "gsap";
 import Image from "next/image";
 import { ArrowUpRight, X } from "lucide-react";
 import {
@@ -16,8 +14,6 @@ import {
   getProjectCategoryLabel,
   hasLiveProjectLink,
 } from "@/data/projects";
-import { prefersReducedMotion } from "@/utils/motion";
-import { animateModalIn } from "@/utils/gsapAnimations";
 
 interface ProjectModalProps {
   project: Project | null;
@@ -32,23 +28,7 @@ export default function ProjectModal({
   onOpenChange,
   language,
 }: ProjectModalProps) {
-  var contentRef = useRef<HTMLDivElement>(null);
   var { t } = useLanguage();
-
-  useEffect(
-    function () {
-      if (!open || !contentRef.current || prefersReducedMotion()) return;
-
-      var ctx = gsap.context(function () {
-        animateModalIn(contentRef.current as HTMLElement);
-      }, contentRef);
-
-      return function () {
-        ctx.revert();
-      };
-    },
-    [open, project],
-  );
 
   if (!project) return null;
 
@@ -73,15 +53,12 @@ export default function ProjectModal({
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent
-        className="w-[min(94vw,58rem)] max-w-none gap-0 overflow-hidden border-border/40 bg-card/95 p-0 backdrop-blur-xl dark:border-white/10 dark:bg-card/95"
+        className="w-[min(94vw,58rem)] max-w-none gap-0 overflow-hidden border-border/40 bg-card p-0 duration-0 data-[state=open]:zoom-in-100 dark:border-white/10"
         showCloseButton={false}
       >
-        <div
-          ref={contentRef}
-          className="project-modal-scroll max-h-[min(90vh,920px)] overflow-y-auto"
-        >
+        <div className="project-modal-scroll max-h-[min(90vh,920px)] overflow-y-auto">
           <div className="flex justify-end px-4 pb-1 pt-3 sm:px-6 sm:pt-4">
-            <DialogClose className="flex h-7 w-7 items-center justify-center rounded-full border border-border/50 bg-background/80 text-foreground shadow-sm backdrop-blur-sm transition-all duration-200 hover:scale-105 hover:bg-muted focus:outline-none dark:border-white/20 dark:bg-white/10 dark:text-white dark:hover:bg-white/20 [&_svg]:size-3.5">
+            <DialogClose className="flex h-7 w-7 items-center justify-center rounded-full border border-border/50 bg-background/80 text-foreground shadow-sm transition-opacity hover:bg-muted focus:outline-none dark:border-white/20 dark:bg-white/10 dark:text-white dark:hover:bg-white/20 [&_svg]:size-3.5">
               <X />
               <span className="sr-only">Close</span>
             </DialogClose>
@@ -89,11 +66,12 @@ export default function ProjectModal({
 
           {project.image && (
             <div className="relative px-6 pb-2 pt-6 sm:px-10 sm:pb-4 sm:pt-8">
-              <div className="modal-hero project-image-frame relative mx-auto aspect-[16/10] w-full max-w-4xl overflow-hidden rounded-2xl">
+              <div className="project-image-frame relative mx-auto aspect-[16/10] w-full max-w-4xl overflow-hidden rounded-2xl">
                 <Image
                   src={project.image}
                   alt={project.title[language]}
                   fill
+                  priority
                   className="object-contain object-center p-2 sm:p-3"
                   sizes="(max-width: 768px) 94vw, 896px"
                 />
@@ -103,20 +81,20 @@ export default function ProjectModal({
           )}
 
           <div className="px-6 pb-8 pt-5 sm:px-10 sm:pb-10 sm:pt-6">
-            <p className="modal-animate mb-2 text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
+            <p className="mb-2 text-[11px] font-medium uppercase tracking-[0.16em] text-muted-foreground">
               {categoryLabel}
             </p>
 
-            <DialogTitle className="modal-animate mb-4 text-2xl font-bold leading-tight text-foreground sm:text-3xl">
+            <DialogTitle className="mb-4 text-2xl font-bold leading-tight text-foreground sm:text-3xl">
               {project.title[language]}
             </DialogTitle>
 
-            <p className="modal-animate mb-8 text-sm leading-relaxed text-muted-foreground sm:text-base">
+            <p className="mb-8 text-sm leading-relaxed text-muted-foreground sm:text-base">
               {project.description[language]}
             </p>
 
-            <div className="modal-animate mb-8 grid gap-4 lg:grid-cols-2 lg:gap-6">
-              <div className="rounded-2xl border border-border/35 bg-background/50 p-5 backdrop-blur-sm sm:p-6 dark:border-white/8 dark:bg-background/40">
+            <div className="mb-8 grid gap-4 lg:grid-cols-2 lg:gap-6">
+              <div className="rounded-2xl border border-border/35 bg-background/50 p-5 sm:p-6 dark:border-white/8 dark:bg-background/40">
                 <h4 className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-foreground">
                   {t("projects.problem")}
                 </h4>
@@ -124,7 +102,7 @@ export default function ProjectModal({
                   {problem}
                 </p>
               </div>
-              <div className="rounded-2xl border border-border/35 bg-background/50 p-5 backdrop-blur-sm sm:p-6 dark:border-white/8 dark:bg-background/40">
+              <div className="rounded-2xl border border-border/35 bg-background/50 p-5 sm:p-6 dark:border-white/8 dark:bg-background/40">
                 <h4 className="mb-3 text-xs font-semibold uppercase tracking-[0.14em] text-foreground">
                   {t("projects.solution")}
                 </h4>
@@ -134,7 +112,7 @@ export default function ProjectModal({
               </div>
             </div>
 
-            <div className="modal-animate mb-8 rounded-2xl border border-border/35 bg-background/40 p-5 backdrop-blur-sm sm:p-6 dark:border-white/8 dark:bg-background/35">
+            <div className="mb-8 rounded-2xl border border-border/35 bg-background/40 p-5 sm:p-6 dark:border-white/8 dark:bg-background/35">
               <h4 className="mb-4 text-xs font-semibold uppercase tracking-[0.14em] text-foreground">
                 {t("projects.features")}
               </h4>
@@ -156,13 +134,13 @@ export default function ProjectModal({
               </ul>
             </div>
 
-            <div className="modal-animate flex flex-col gap-5 border-t border-border/35 pt-6 sm:flex-row sm:items-center sm:justify-between dark:border-white/8">
+            <div className="flex flex-col gap-5 border-t border-border/35 pt-6 sm:flex-row sm:items-center sm:justify-between dark:border-white/8">
               <div className="flex flex-wrap gap-2">
                 {project.technologies.map(function (tech) {
                   return (
                     <span
                       key={tech}
-                      className="rounded-full border border-border/50 bg-background/60 px-3.5 py-1.5 text-xs text-muted-foreground backdrop-blur-sm dark:border-white/12 dark:bg-background/50 dark:text-foreground/80"
+                      className="rounded-full border border-border/50 bg-background/60 px-3.5 py-1.5 text-xs text-muted-foreground dark:border-white/12 dark:bg-background/50 dark:text-foreground/80"
                     >
                       {tech}
                     </span>
