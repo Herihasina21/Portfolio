@@ -21,6 +21,8 @@ import { revealSectionHeader } from '@/utils/gsapAnimations'
 
 var CAROUSEL_DURATION = 1.05
 var CAROUSEL_EASE = 'power4.inOut'
+var SWIPE_THRESHOLD = 60
+var SWIPE_AXIS_LOCK = 8
 
 function buildExtendedProjects(items: Project[]) {
   if (items.length === 0) return []
@@ -49,6 +51,14 @@ export default function Projects() {
   var trackIndexRef = useRef(0)
   var isAnimatingRef = useRef(false)
   var skipAnimationRef = useRef(false)
+  var pointerIdRef = useRef<number | null>(null)
+  var dragStartXRef = useRef(0)
+  var dragStartYRef = useRef(0)
+  var dragDeltaXRef = useRef(0)
+  var dragOriginOffsetRef = useRef(0)
+  var isDraggingRef = useRef(false)
+  var isHorizontalSwipeRef = useRef(false)
+  var didSwipeRef = useRef(false)
   var { t, language } = useLanguage()
 
   var extendedProjects = useMemo(function () {
@@ -166,9 +176,103 @@ export default function Projects() {
   }
 
   var handleProjectClick = function (project: Project, realIndex: number) {
+    if (didSwipeRef.current) {
+      didSwipeRef.current = false
+      return
+    }
+
     setTrackIndex(realIndex + 1)
     setSelectedProject(project)
     setModalOpen(true)
+  }
+
+  var handlePointerDown = function (
+    event: React.PointerEvent<HTMLDivElement>,
+  ) {
+    if (event.button !== 0) return
+    if (isAnimatingRef.current || projects.length <= 1) return
+
+    var track = trackRef.current
+    if (!track) return
+
+    pointerIdRef.current = event.pointerId
+    dragStartXRef.current = event.clientX
+    dragStartYRef.current = event.clientY
+    dragDeltaXRef.current = 0
+    dragOriginOffsetRef.current = getSlideOffset(trackIndexRef.current)
+    isDraggingRef.current = true
+    isHorizontalSwipeRef.current = false
+    didSwipeRef.current = false
+
+    gsap.killTweensOf(track)
+    event.currentTarget.setPointerCapture(event.pointerId)
+  }
+
+  var handlePointerMove = function (
+    event: React.PointerEvent<HTMLDivElement>,
+  ) {
+    if (!isDraggingRef.current) return
+    if (pointerIdRef.current !== event.pointerId) return
+
+    var deltaX = event.clientX - dragStartXRef.current
+    var deltaY = event.clientY - dragStartYRef.current
+    dragDeltaXRef.current = deltaX
+
+    if (
+      !isHorizontalSwipeRef.current &&
+      Math.abs(deltaX) > SWIPE_AXIS_LOCK &&
+      Math.abs(deltaX) > Math.abs(deltaY)
+    ) {
+      isHorizontalSwipeRef.current = true
+    }
+
+    if (!isHorizontalSwipeRef.current) return
+
+    var track = trackRef.current
+    if (!track) return
+
+    gsap.set(track, {
+      x: -(dragOriginOffsetRef.current - deltaX),
+    })
+  }
+
+  var endPointerGesture = function (
+    event: React.PointerEvent<HTMLDivElement>,
+  ) {
+    if (!isDraggingRef.current) return
+    if (
+      pointerIdRef.current !== null &&
+      pointerIdRef.current !== event.pointerId
+    ) {
+      return
+    }
+
+    var deltaX = dragDeltaXRef.current
+    var wasHorizontal = isHorizontalSwipeRef.current
+
+    isDraggingRef.current = false
+    isHorizontalSwipeRef.current = false
+    pointerIdRef.current = null
+
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId)
+    }
+
+    if (!wasHorizontal || Math.abs(deltaX) < SWIPE_THRESHOLD) {
+      if (wasHorizontal) {
+        didSwipeRef.current = true
+      }
+      moveToTrackIndex(trackIndexRef.current, true)
+      return
+    }
+
+    didSwipeRef.current = true
+
+    if (deltaX < 0) {
+      handleNext()
+    } else {
+      handlePrev()
+    }
   }
 
   return (
@@ -188,7 +292,11 @@ export default function Projects() {
 
         <div
           ref={viewportRef}
-          className="projects-carousel-viewport relative overflow-hidden py-2"
+          className="projects-carousel-viewport relative cursor-grab overflow-hidden py-2 touch-pan-y active:cursor-grabbing"
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={endPointerGesture}
+          onPointerCancel={endPointerGesture}
         >
           <div
             ref={trackRef}

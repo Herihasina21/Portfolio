@@ -56,6 +56,11 @@ export const skillCategories: SkillCategory[] = [
         logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/tailwindcss/tailwindcss-original.svg",
         glow: "#38bdf8",
       },
+      {
+        name: "Vite",
+        logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vitejs/vitejs-original.svg",
+        glow: "#646cff",
+      },
     ],
   },
   {
@@ -166,10 +171,20 @@ export const skillCategories: SkillCategory[] = [
         glow: "#000000",
       },
       {
-        name:"Vercel",
+        name: "Vercel",
         logo: "https://cdn.jsdelivr.net/gh/devicons/devicon/icons/vercel/vercel-original.svg",
         glow: "#000000",
-      }
+      },
+      {
+        name: "Render",
+        logo: "https://cdn.simpleicons.org/render/46E3B7",
+        glow: "#46e3b7",
+      },
+      {
+        name: "Google Gemini",
+        logo: "https://cdn.simpleicons.org/googlegemini/8E75B2",
+        glow: "#8e75b2",
+      },
     ],
   },
 ];
