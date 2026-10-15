@@ -31,7 +31,7 @@ const dmSans = DM_Sans({
 const siteUrl = getSiteUrl()
 
 const ogImage = {
-  url: '/assets/herihasina.jpeg',
+  url: '/assets/herihasina.png',
   width: 1200,
   height: 1200,
   alt: 'Herihasina Michael Rakotoarivony — Développeur Fullstack Junior',

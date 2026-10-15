@@ -64,6 +64,11 @@ export default function ExperienceTimeline({
                   <p className="text-sm text-accent">
                     {item.company[language]}
                   </p>
+                  {item.description && (
+                    <p className="text-sm text-muted-foreground mt-2 leading-relaxed">
+                      {item.description[language]}
+                    </p>
+                  )}
                   {item.stack && item.stack.length > 0 && (
                     <div className="flex flex-wrap gap-2 mt-4">
                       {item.stack.map(function (tech) {
