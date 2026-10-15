@@ -47,10 +47,13 @@ export default function ContactInfo({ className = "" }: ContactInfoProps) {
     <div className={`space-y-4 ${className}`}>
       {contactItems.map(function (item, index) {
         var Icon = item.icon;
+        var isExternal = item.href.startsWith("http");
         return (
           <a
             key={index}
             href={item.href}
+            target={isExternal ? "_blank" : undefined}
+            rel={isExternal ? "noopener noreferrer" : undefined}
             className="contact-card fade-in-item portfolio-card portfolio-card-hover flex items-start gap-4 p-5 group"
           >
             <div className="p-3 rounded-xl bg-accent/10 text-accent group-hover:bg-accent group-hover:text-accent-foreground transition-colors shrink-0">

@@ -2,7 +2,7 @@ export const CONTACT_EMAIL = "herihasinamichael@gmail.com";
 
 export const CONTACT_PHONE = {
   display: "+261 34 32 650 80",
-  href: "tel:+261343265080",
+  href: "https://wa.me/261343265080",
 } as const;
 
 export const CONTACT_LOCATION = {
