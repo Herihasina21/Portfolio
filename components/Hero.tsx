@@ -345,7 +345,7 @@ export default function Hero() {
 
             <div ref={portraitRef} className="hero-blob-frame">
               <Image
-                src="/assets/herihasina.jpeg"
+                src="/assets/herihasina.png"
                 alt="Herihasina Michael Rakotoarivony"
                 fill
                 priority
