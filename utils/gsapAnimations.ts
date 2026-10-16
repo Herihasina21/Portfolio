@@ -438,6 +438,8 @@ export function setupSmoothScroll() {
       behavior: 'smooth',
       block: 'start',
     })
+
+    history.replaceState(null, '', href)
   }
 
   links.forEach(function (link) {
