@@ -137,9 +137,14 @@
   html {
     scroll-behavior: smooth;
     scroll-snap-type: y mandatory;
-    scroll-padding-top: 4rem;
+    scroll-padding-top: calc(3.5rem + 1px);
     scrollbar-width: thin;
     scrollbar-color: var(--accent) transparent;
+  }
+  @media (min-width: 640px) {
+    html {
+      scroll-padding-top: calc(4rem + 1px);
+    }
   }
   html::-webkit-scrollbar {
     width: 8px;
@@ -168,10 +173,6 @@
       system-ui, sans-serif;
     letter-spacing: -0.02em;
   }
-  section[id] {
-    scroll-margin-top: 4rem;
-  }
-
   @media (prefers-reduced-motion: reduce) {
     html {
       scroll-snap-type: none;
@@ -499,11 +500,12 @@
 
   .projects-carousel-viewport {
     @apply -mx-2 sm:-mx-4;
+    perspective: 1400px;
     mask-image: linear-gradient(
       to right,
       transparent,
-      black 5%,
-      black 95%,
+      black 8%,
+      black 92%,
       transparent
     );
   }
