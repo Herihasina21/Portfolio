@@ -499,11 +499,12 @@
 
   .projects-carousel-viewport {
     @apply -mx-2 sm:-mx-4;
+    perspective: 1400px;
     mask-image: linear-gradient(
       to right,
       transparent,
-      black 5%,
-      black 95%,
+      black 8%,
+      black 92%,
       transparent
     );
   }

@@ -8,7 +8,12 @@ import {
   useRef,
   useState,
 } from 'react'
-import gsap from 'gsap'
+import {
+  animate,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+} from 'motion/react'
 import { ChevronLeft, ChevronRight } from 'lucide-react'
 import SectionHeader from './SectionHeader'
 import ProjectCard from './ProjectCard'
@@ -19,20 +24,28 @@ import { useLanguage } from '@/context/LanguageContext'
 import { shouldAnimateOnScroll } from '@/utils/motion'
 import { revealSectionHeader } from '@/utils/gsapAnimations'
 
-var CAROUSEL_DURATION = 1.05
-var CAROUSEL_EASE = 'power4.inOut'
-var SWIPE_THRESHOLD = 60
-var SWIPE_AXIS_LOCK = 8
+var SWIPE_THRESHOLD = 56
+var SWIPE_VELOCITY = 420
+
+var SPRING = {
+  type: 'spring' as const,
+  stiffness: 280,
+  damping: 32,
+  mass: 0.85,
+}
+
+var SNAP_EASE = {
+  type: 'spring' as const,
+  stiffness: 380,
+  damping: 38,
+  mass: 0.7,
+}
 
 function buildExtendedProjects(items: Project[]) {
   if (items.length === 0) return []
   if (items.length === 1) return [items[0], items[0], items[0]]
 
-  return [
-    items[items.length - 1],
-    ...items,
-    items[0],
-  ]
+  return [items[items.length - 1], ...items, items[0]]
 }
 
 function getRealIndex(trackIndex: number, total: number) {
@@ -44,21 +57,16 @@ function getRealIndex(trackIndex: number, total: number) {
 
 export default function Projects() {
   var sectionRef = useRef<HTMLDivElement>(null)
-  var trackRef = useRef<HTMLDivElement>(null)
   var viewportRef = useRef<HTMLDivElement>(null)
   var slideRefs = useRef<Array<HTMLDivElement | null>>([])
   var hasPositionedRef = useRef(false)
   var trackIndexRef = useRef(0)
   var isAnimatingRef = useRef(false)
   var skipAnimationRef = useRef(false)
-  var pointerIdRef = useRef<number | null>(null)
-  var dragStartXRef = useRef(0)
-  var dragStartYRef = useRef(0)
-  var dragDeltaXRef = useRef(0)
-  var dragOriginOffsetRef = useRef(0)
-  var isDraggingRef = useRef(false)
-  var isHorizontalSwipeRef = useRef(false)
-  var didSwipeRef = useRef(false)
+  var animationControlsRef = useRef<{ stop: () => void } | null>(null)
+
+  var x = useMotionValue(0)
+  var prefersReduced = useReducedMotion()
   var { t, language } = useLanguage()
 
   var extendedProjects = useMemo(function () {
@@ -70,6 +78,7 @@ export default function Projects() {
   var [trackIndex, setTrackIndex] = useState(initialTrackIndex)
   var [selectedProject, setSelectedProject] = useState<Project | null>(null)
   var [modalOpen, setModalOpen] = useState(false)
+  var didDragRef = useRef(false)
 
   trackIndexRef.current = trackIndex
 
@@ -84,33 +93,33 @@ export default function Projects() {
   }, [])
 
   var moveToTrackIndex = useCallback(
-    function (index: number, animate: boolean, onComplete?: () => void) {
-      var track = trackRef.current
-      if (!track) return
-
+    function (index: number, withAnimation: boolean, onComplete?: () => void) {
       var offset = getSlideOffset(index)
 
-      gsap.killTweensOf(track)
+      if (animationControlsRef.current) {
+        animationControlsRef.current.stop()
+        animationControlsRef.current = null
+      }
 
-      if (animate && hasPositionedRef.current) {
+      if (withAnimation && hasPositionedRef.current && !prefersReduced) {
         isAnimatingRef.current = true
-        gsap.to(track, {
-          x: -offset,
-          duration: CAROUSEL_DURATION,
-          ease: CAROUSEL_EASE,
-          overwrite: true,
+        var controls = animate(x, -offset, {
+          ...SPRING,
           onComplete: function () {
             isAnimatingRef.current = false
+            animationControlsRef.current = null
             if (onComplete) onComplete()
           },
         })
+        animationControlsRef.current = controls
       } else {
-        gsap.set(track, { x: -offset })
+        x.set(-offset)
         hasPositionedRef.current = true
+        isAnimatingRef.current = false
         if (onComplete) onComplete()
       }
     },
-    [getSlideOffset],
+    [getSlideOffset, prefersReduced, x],
   )
 
   useLayoutEffect(
@@ -157,6 +166,14 @@ export default function Projects() {
     revealSectionHeader(sectionRef.current, '.projects-header')
   }, [])
 
+  useEffect(function () {
+    return function () {
+      if (animationControlsRef.current) {
+        animationControlsRef.current.stop()
+      }
+    }
+  }, [])
+
   var goToSlide = function (realIndex: number) {
     if (projects.length === 0 || isAnimatingRef.current) return
     var nextTrackIndex = realIndex + 1
@@ -176,8 +193,8 @@ export default function Projects() {
   }
 
   var handleProjectClick = function (project: Project, realIndex: number) {
-    if (didSwipeRef.current) {
-      didSwipeRef.current = false
+    if (didDragRef.current) {
+      didDragRef.current = false
       return
     }
 
@@ -189,85 +206,38 @@ export default function Projects() {
     }
   }
 
-  var handlePointerDown = function (
-    event: React.PointerEvent<HTMLDivElement>,
-  ) {
-    if (event.button !== 0) return
-    if (isAnimatingRef.current || projects.length <= 1) return
-
-    pointerIdRef.current = event.pointerId
-    dragStartXRef.current = event.clientX
-    dragStartYRef.current = event.clientY
-    dragDeltaXRef.current = 0
-    dragOriginOffsetRef.current = getSlideOffset(trackIndexRef.current)
-    isDraggingRef.current = true
-    isHorizontalSwipeRef.current = false
-    didSwipeRef.current = false
+  var handleDragStart = function () {
+    if (animationControlsRef.current) {
+      animationControlsRef.current.stop()
+      animationControlsRef.current = null
+    }
+    isAnimatingRef.current = false
+    didDragRef.current = false
   }
 
-  var handlePointerMove = function (
-    event: React.PointerEvent<HTMLDivElement>,
+  var handleDrag = function (
+    _: MouseEvent | TouchEvent | PointerEvent,
+    info: { offset: { x: number } },
   ) {
-    if (!isDraggingRef.current) return
-    if (pointerIdRef.current !== event.pointerId) return
-
-    var deltaX = event.clientX - dragStartXRef.current
-    var deltaY = event.clientY - dragStartYRef.current
-    dragDeltaXRef.current = deltaX
-
-    if (
-      !isHorizontalSwipeRef.current &&
-      Math.abs(deltaX) > SWIPE_AXIS_LOCK &&
-      Math.abs(deltaX) > Math.abs(deltaY)
-    ) {
-      isHorizontalSwipeRef.current = true
-      var track = trackRef.current
-      if (track) gsap.killTweensOf(track)
-      event.currentTarget.setPointerCapture(event.pointerId)
+    if (Math.abs(info.offset.x) > 8) {
+      didDragRef.current = true
     }
-
-    if (!isHorizontalSwipeRef.current) return
-
-    var trackEl = trackRef.current
-    if (!trackEl) return
-
-    gsap.set(trackEl, {
-      x: -(dragOriginOffsetRef.current - deltaX),
-    })
   }
 
-  var endPointerGesture = function (
-    event: React.PointerEvent<HTMLDivElement>,
+  var handleDragEnd = function (
+    _: MouseEvent | TouchEvent | PointerEvent,
+    info: { offset: { x: number }; velocity: { x: number } },
   ) {
-    if (!isDraggingRef.current) return
-    if (
-      pointerIdRef.current !== null &&
-      pointerIdRef.current !== event.pointerId
-    ) {
-      return
-    }
+    var shouldAdvance =
+      Math.abs(info.offset.x) > SWIPE_THRESHOLD ||
+      Math.abs(info.velocity.x) > SWIPE_VELOCITY
 
-    var deltaX = dragDeltaXRef.current
-    var wasHorizontal = isHorizontalSwipeRef.current
-
-    isDraggingRef.current = false
-    isHorizontalSwipeRef.current = false
-    pointerIdRef.current = null
-
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId)
-    }
-
-    if (!wasHorizontal) return
-
-    didSwipeRef.current = true
-
-    if (Math.abs(deltaX) < SWIPE_THRESHOLD) {
+    if (!shouldAdvance) {
       moveToTrackIndex(trackIndexRef.current, true)
       return
     }
 
-    if (deltaX < 0) {
+    if (info.offset.x < 0 || info.velocity.x < -SWIPE_VELOCITY) {
       handleNext()
     } else {
       handlePrev()
@@ -291,15 +261,18 @@ export default function Projects() {
 
         <div
           ref={viewportRef}
-          className="projects-carousel-viewport relative cursor-grab overflow-hidden py-2 touch-pan-y active:cursor-grabbing"
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={endPointerGesture}
-          onPointerCancel={endPointerGesture}
+          className="projects-carousel-viewport relative overflow-hidden py-4 touch-pan-y"
         >
-          <div
-            ref={trackRef}
-            className="flex items-center gap-6 sm:gap-8 lg:gap-10 will-change-transform"
+          <motion.div
+            className="flex cursor-grab items-center gap-6 will-change-transform active:cursor-grabbing sm:gap-8 lg:gap-10"
+            style={{ x }}
+            drag={projects.length > 1 ? 'x' : false}
+            dragConstraints={{ left: -99999, right: 99999 }}
+            dragElastic={0.12}
+            dragMomentum={false}
+            onDragStart={handleDragStart}
+            onDrag={handleDrag}
+            onDragEnd={handleDragEnd}
           >
             {extendedProjects.map(function (project, index) {
               var realIndex = getRealIndex(index, projects.length)
@@ -318,7 +291,8 @@ export default function Projects() {
                   <ProjectCard
                     project={project}
                     language={language}
-                    isActive={index === trackIndex}
+                    distance={index - trackIndex}
+                    reducedMotion={!!prefersReduced}
                     onClick={function () {
                       handleProjectClick(project, realIndex)
                     }}
@@ -326,21 +300,26 @@ export default function Projects() {
                 </div>
               )
             })}
-          </div>
+          </motion.div>
         </div>
 
         <div className="mt-8 flex items-center justify-center gap-4 sm:mt-10">
-          <button
+          <motion.button
             type="button"
             onClick={handlePrev}
             aria-label={t('projects.prev')}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-border/50 bg-card/60 text-foreground backdrop-blur-sm transition-all hover:border-foreground/30 hover:bg-card"
+            whileHover={prefersReduced ? undefined : { scale: 1.06 }}
+            whileTap={prefersReduced ? undefined : { scale: 0.94 }}
+            transition={SNAP_EASE}
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-border/50 bg-card/60 text-foreground backdrop-blur-sm transition-colors hover:border-foreground/30 hover:bg-card"
           >
             <ChevronLeft className="h-5 w-5" />
-          </button>
+          </motion.button>
 
           <div className="flex items-center gap-2">
             {projects.map(function (_, index) {
+              var isActive = index === activeIndex
+
               return (
                 <button
                   key={index}
@@ -349,24 +328,38 @@ export default function Projects() {
                     goToSlide(index)
                   }}
                   aria-label={`${t('projects.go_to')} ${index + 1}`}
-                  className={`h-2 rounded-full transition-all duration-500 ease-out ${
-                    index === activeIndex
-                      ? 'w-7 bg-foreground'
-                      : 'w-2 bg-muted-foreground/35 hover:bg-muted-foreground/60'
-                  }`}
-                />
+                  aria-current={isActive ? 'true' : undefined}
+                  className="relative flex h-2 items-center justify-center"
+                >
+                  <motion.span
+                    className={`block h-2 rounded-full ${
+                      isActive
+                        ? 'bg-foreground'
+                        : 'bg-muted-foreground/35 hover:bg-muted-foreground/60'
+                    }`}
+                    animate={{ width: isActive ? 28 : 8 }}
+                    transition={
+                      prefersReduced
+                        ? { duration: 0 }
+                        : { type: 'spring', stiffness: 400, damping: 28 }
+                    }
+                  />
+                </button>
               )
             })}
           </div>
 
-          <button
+          <motion.button
             type="button"
             onClick={handleNext}
             aria-label={t('projects.next')}
-            className="flex h-11 w-11 items-center justify-center rounded-full border border-border/50 bg-card/60 text-foreground backdrop-blur-sm transition-all hover:border-foreground/30 hover:bg-card"
+            whileHover={prefersReduced ? undefined : { scale: 1.06 }}
+            whileTap={prefersReduced ? undefined : { scale: 0.94 }}
+            transition={SNAP_EASE}
+            className="flex h-11 w-11 items-center justify-center rounded-full border border-border/50 bg-card/60 text-foreground backdrop-blur-sm transition-colors hover:border-foreground/30 hover:bg-card"
           >
             <ChevronRight className="h-5 w-5" />
-          </button>
+          </motion.button>
         </div>
       </div>
 
